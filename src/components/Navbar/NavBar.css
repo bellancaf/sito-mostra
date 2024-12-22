@@ -71,7 +71,7 @@
 .barcode-text {
     font-family: var(--font-family-barcode);
     font-size: var(--text-4xl);
-    color: var(--color-primary);
+    color: var(--color-gray-600);
     line-height: 1;
     opacity: 0.7;
     transition: opacity 0.3s ease;
@@ -99,17 +99,19 @@
         gap: 6px;
         cursor: pointer;
         padding: var(--spacing-2);
+        margin-right: var(--spacing-4);
+        padding-bottom: var(--spacing-4);
     }
 
     .hamburger {
-        width: 24px;
+        width: 20px;
         height: 2px;
-        background-color: var(--color-gray-700);
+        background-color: var(--color-gray-600);
         transition: all 0.3s ease;
     }
 
     .navbar-toggle.open .hamburger:nth-child(1) {
-        transform: rotate(45deg) translate(6px, 6px);
+        transform: rotate(40deg) translate(6px, 6px);
     }
 
     .navbar-toggle.open .hamburger:nth-child(2) {
@@ -117,7 +119,7 @@
     }
 
     .navbar-toggle.open .hamburger:nth-child(3) {
-        transform: rotate(-45deg) translate(6px, -6px);
+        transform: rotate(-42deg) translate(5px, -6px);
     }
 
     .navbar-links {
@@ -146,11 +148,12 @@
         flex-direction: column;
         gap: var(--spacing-4);
         padding: var(--spacing-4);
+        list-style: none;
     }
 
     /* Mobile barcode text adjustments */
     .barcode-text {
-        font-size: var(--text-base);
+        font-size: var(--text-3xl);
     }
 
     .nav-link-container {

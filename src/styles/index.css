@@ -7,10 +7,9 @@ body {
 	-moz-osx-font-smoothing: grayscale;
 	background-color: var(--color-background);
 	background-image: url('../../public/images/background.png');
-    background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
-	background-position: center -350px;  /* X position center, Y position moved up 100px */
+	background-position: center 110%;  /* X position center, Y position moved up 100px */
     background-attachment: fixed;
     min-height: 100vh;
 }
@@ -37,4 +36,14 @@ code {
 
 ::-webkit-scrollbar-thumb:hover {
     background: #555;
+}
+
+@media screen and (max-width: 768px) {
+    body {
+		background-repeat: no-repeat;
+		background-size: cover;
+		background-position: 92.5% -20px;
+		background-attachment: fixed;
+		min-height: 100vh;
+    }
 }

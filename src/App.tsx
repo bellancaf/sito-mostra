@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-route
 import HomePage from './components/Homepage/Homepage';
 import NavBar from './components/Navbar/NavBar';
 import Mostra from './components/Mostra/Mostra';
+import Footer from './components/Footer/Footer';
 
 import './styles/main.css';
 
@@ -43,14 +44,9 @@ const AppContent: React.FC = () => {
                         isNavbarVisible={isNavbarVisible}
                     />
                 } />
-                <Route path="/homepage" element={
-                    <HomeComponent 
-                        setIsNavbarVisible={setIsNavbarVisible} 
-                        isNavbarVisible={isNavbarVisible}
-                    />
-                } />
                 <Route path="/mostra" element={<Mostra />} />
             </Routes>
+            <Footer />
         </>
     );
 };

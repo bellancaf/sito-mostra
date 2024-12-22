@@ -1,12 +1,12 @@
 :root {
     /* Colors - Main palette */
-    --color-background: #000;
+    --color-background: #ffffff;
     
-    --color-primary: #303030;
+    --color-primary: #6d6d6d;
     --color-primary-light: #404040;
     --color-primary-dark: #202020;
     
-    --color-secondary: #f59e0b;
+    --color-secondary: #2c2c2c;
     --color-secondary-light: #fbbd23;
     --color-secondary-dark: #92400e;
 
@@ -30,7 +30,10 @@
     --color-error: #ef4444;
     --color-info: #3b82f6;
 
-    /* Typography */
+    /* Add the new font variable */
+    --font-family-barcode: 'Libre Barcode 128 Text', monospace;
+    
+    /* Your existing CSS variables */
     --font-family-base: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
     --font-family-heading: var(--font-family-base);
     

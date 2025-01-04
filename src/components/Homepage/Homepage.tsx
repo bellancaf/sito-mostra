@@ -1,6 +1,5 @@
 import React from 'react';
 import { HeroSection } from './components';
-
 import './Homepage.css';
 
 interface HomepageProps {
@@ -9,11 +8,11 @@ interface HomepageProps {
 }
 
 const Homepage: React.FC<HomepageProps> = ({ setIsNavbarVisible, isNavbarVisible }) => {
-	return (
-		<div className="homepage">
-			<HeroSection />
-		</div>
-	);
+    return (
+        <div className="homepage">
+            <HeroSection />
+        </div>
+    );
 };
 
 export default Homepage;

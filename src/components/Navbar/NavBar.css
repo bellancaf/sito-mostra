@@ -11,6 +11,11 @@
     transform: translateY(0);
 }
 
+/* Add this to ensure content starts below navbar */
+.app {
+    padding-top: 84px; /* Adjust this value based on your navbar height */
+}
+
 .navbar-container {
     width: 100%;
     display: flex;
@@ -40,13 +45,14 @@
 
 .navbar-links {
     display: flex;
-    margin-left: 63%;
+    margin-left: auto;
+    margin-right: var(--spacing-8);
     align-items: center;
 }
 
 .navbar-links ul {
     display: flex;
-    gap: var(--spacing-4);
+    gap: var(--spacing-12);
     list-style: none;
     margin: 0;
     padding: 0;
@@ -59,7 +65,9 @@
     align-items: center;
     text-decoration: none;
     gap: var(--spacing-1);
-    padding: var(--spacing-1) var(--spacing-2);
+    padding: var(--spacing-2) var(--spacing-4);
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
 }
 
 .nav-link-container.mobile {
@@ -182,4 +190,10 @@
         opacity: 1;
         pointer-events: all;
     }
+}
+
+.nav-link-container:hover {
+    border-color: var(--color-accent);
+    background-color: var(--color-background);
+    border-radius: var(--radius-md);
 }

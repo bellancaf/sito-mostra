@@ -1,0 +1,132 @@
+.book-page {
+    padding: var(--spacing-8);
+    max-width: 1400px;
+    margin: 0 auto;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.book-page.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.book-main {
+    margin-bottom: var(--spacing-8);
+}
+
+.book-header {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: var(--spacing-8);
+    align-items: start;
+}
+
+.book-cover-large {
+    width: 100%;
+    aspect-ratio: 2/3;
+    object-fit: cover;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+}
+
+.book-info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-4);
+}
+
+.book-info h1 {
+    font-family: var(--font-family-barcode);
+    font-size: var(--text-4xl);
+    color: var(--color-gray-600);
+    margin: 0;
+}
+
+.book-info h2 {
+    font-size: var(--text-2xl);
+    color: var(--color-gray-500);
+    margin: 0;
+}
+
+.book-year {
+    font-family: monospace;
+    color: var(--color-accent);
+    font-size: var(--text-lg);
+}
+
+.book-description {
+    color: var(--color-gray-500);
+    line-height: 1.8;
+    font-size: var(--text-lg);
+}
+
+.book-related {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-8);
+}
+
+@media (max-width: 768px) {
+    .book-header {
+        grid-template-columns: 1fr;
+    }
+
+    .book-cover-large {
+        max-width: 300px;
+        margin: 0 auto;
+    }
+
+    .book-related {
+        grid-template-columns: 1fr;
+    }
+}
+
+.related-collages h2,
+.book-diary-entries h2 {
+    font-family: var(--font-family-barcode);
+    font-size: var(--text-2xl);
+    color: var(--color-gray-600);
+    margin-bottom: var(--spacing-4);
+}
+
+.collages-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: var(--spacing-4);
+}
+
+.collage-card-mini {
+    text-decoration: none;
+    background: var(--color-background);
+    border: 2px solid var(--color-gray-200);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.collage-card-mini:hover {
+    transform: translateY(-4px);
+    border-color: var(--color-accent);
+}
+
+.entries-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-4);
+}
+
+.diary-entry-preview {
+    text-decoration: none;
+    background: var(--color-background);
+    border: 2px solid var(--color-gray-200);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-4);
+    transition: all 0.3s ease;
+}
+
+.diary-entry-preview:hover {
+    transform: translateX(4px);
+    border-color: var(--color-accent);
+} 

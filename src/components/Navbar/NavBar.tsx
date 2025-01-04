@@ -36,16 +36,20 @@ const NavBar: React.FC<NavBarProps> = ({ isNavbarVisible }) => {
     }, []);
 
 	const renderNavLinks = (isMobileView: boolean = false) => {
-        return ['exhibition', 'about', 'contact'].map((item) => (
-            <li key={item}>
+        return [
+            { path: '/collages', label: 'collages' },
+            { path: '/books', label: 'library' },
+            { path: '/diary', label: 'diary' }
+        ].map((item) => (
+            <li key={item.path}>
                 <Link 
-                    to={item === 'home' ? '/' : `/${item}`}
+                    to={item.path}
                     className={`nav-link-container ${
                         isMobileView ? 'mobile' : ''
                     }`}
                     onClick={isMobileView ? toggleMobileMenu : undefined}
                 >
-                    <span className="barcode-text">{item}</span>
+                    <span className="barcode-text">{item.label}</span>
                 </Link>
             </li>
         ));

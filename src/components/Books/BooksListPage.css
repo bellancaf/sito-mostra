@@ -1,0 +1,114 @@
+.books-list-page {
+    padding: var(--spacing-8);
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.books-title {
+    font-family: var(--font-family-barcode);
+    font-size: var(--text-4xl);
+    color: var(--color-gray-600);
+    margin-bottom: var(--spacing-8);
+    text-align: center;
+}
+
+.books-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-4);
+}
+
+/* Animation for cards */
+.expandable-book-card {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.6s ease forwards;
+}
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.expandable-book-card:nth-child(odd) {
+    animation-delay: 0.2s;
+}
+
+.expandable-book-card:nth-child(even) {
+    animation-delay: 0.4s;
+}
+
+.view-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-4);
+    margin: 0 auto var(--spacing-8);
+}
+
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 30px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--color-gray-300);
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 22px;
+    width: 22px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .toggle-slider {
+    background-color: var(--color-accent);
+}
+
+input:checked + .toggle-slider:before {
+    transform: translateX(30px);
+}
+
+.toggle-label {
+    font-size: var(--text-sm);
+    color: var(--color-gray-600);
+    user-select: none;
+}
+
+.toggle-label.active {
+    color: var(--color-accent);
+    font-weight: 600;
+}
+
+.books-network {
+    width: 100%;
+    height: 80vh;
+    background: var(--color-background);
+    border: 2px solid var(--color-gray-200);
+    border-radius: var(--radius-lg);
+    margin-top: var(--spacing-4);
+} 

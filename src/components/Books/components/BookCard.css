@@ -1,0 +1,84 @@
+.book-card {
+    background-color: var(--color-background);
+    border: 2px solid var(--color-gray-200);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.book-card:hover {
+    border-color: var(--color-accent);
+}
+
+.book-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-4);
+    cursor: pointer;
+    background-color: var(--color-background);
+}
+
+.book-title {
+    margin: 0;
+    font-family: var(--font-family-barcode);
+    font-size: var(--text-xl);
+    color: var(--color-gray-600);
+}
+
+.book-year {
+    font-family: monospace;
+    color: var(--color-accent);
+}
+
+.expand-icon {
+    transition: transform 0.3s ease;
+    color: var(--color-gray-400);
+}
+
+.expand-icon.expanded {
+    transform: rotate(180deg);
+}
+
+.book-card-content {
+    padding: var(--spacing-4);
+    border-top: 1px solid var(--color-gray-200);
+}
+
+.book-cover {
+    width: 150px;
+    height: auto;
+    border-radius: var(--radius-sm);
+    margin-bottom: var(--spacing-4);
+}
+
+.book-description {
+    color: var(--color-gray-600);
+    margin-bottom: var(--spacing-4);
+    line-height: 1.6;
+}
+
+.diary-entry {
+    background-color: var(--color-gray-100);
+    padding: var(--spacing-4);
+    border-radius: var(--radius-sm);
+    margin-bottom: var(--spacing-4);
+}
+
+.diary-entry h4 {
+    margin: 0 0 var(--spacing-2);
+    color: var(--color-accent);
+    font-family: var(--font-family-barcode);
+}
+
+.book-link {
+    display: inline-block;
+    color: var(--color-accent);
+    text-decoration: none;
+    font-family: monospace;
+    transition: transform 0.3s ease;
+}
+
+.book-link:hover {
+    transform: translateX(4px);
+} 

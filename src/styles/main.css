@@ -56,6 +56,9 @@
     --spacing-8: 2rem;
     --spacing-12: 3rem;
     --spacing-16: 4rem;
+    --spacing-20: 5rem;
+    --spacing-24: 6rem;
+    --spacing-32: 8rem;
 
     /* Border radius */
     --radius-sm: 0.125rem;
@@ -67,4 +70,27 @@
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.7);
     --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.7);
     --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.7);
+}
+
+/* Add these base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+}
+
+.main-content {
+    min-height: calc(100vh - 60px);
+    display: flex;
+    flex-direction: column;
+    margin-bottom: var(--spacing-20);
+    padding: var(--spacing-8) var(--spacing-4);
+    /* Add this to force some space */
+    gap: var(--spacing-8);
 }

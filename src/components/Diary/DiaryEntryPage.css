@@ -1,0 +1,154 @@
+.diary-entry-page {
+    padding: var(--spacing-8);
+    max-width: 1000px;
+    margin: 0 auto;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.diary-entry-page.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.diary-entry-main {
+    background: var(--color-background);
+    border: 2px solid var(--color-gray-200);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-8);
+    margin-bottom: var(--spacing-8);
+}
+
+.diary-entry-header {
+    margin-bottom: var(--spacing-8);
+    text-align: center;
+}
+
+.diary-entry-meta {
+    display: flex;
+    justify-content: center;
+    gap: var(--spacing-4);
+    margin-bottom: var(--spacing-4);
+    font-family: monospace;
+}
+
+.entry-date {
+    color: var(--color-accent);
+}
+
+.entry-location,
+.entry-mood {
+    color: var(--color-gray-500);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+}
+
+.entry-location::before {
+    content: "📍";
+}
+
+.entry-mood::before {
+    content: "🌟";
+}
+
+.diary-entry-header h1 {
+    font-family: var(--font-family-barcode);
+    font-size: var(--text-4xl);
+    color: var(--color-gray-600);
+    margin: 0;
+}
+
+.diary-entry-content {
+    color: var(--color-gray-600);
+    line-height: 1.8;
+    font-size: var(--text-lg);
+    white-space: pre-wrap;
+}
+
+.diary-entry-related {
+    display: grid;
+    gap: var(--spacing-8);
+}
+
+.related-books h2,
+.related-collages h2 {
+    font-family: var(--font-family-barcode);
+    font-size: var(--text-2xl);
+    color: var(--color-gray-600);
+    margin-bottom: var(--spacing-4);
+}
+
+.books-grid,
+.collages-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: var(--spacing-4);
+}
+
+.book-card-mini,
+.collage-card-mini {
+    text-decoration: none;
+    background: var(--color-background);
+    border: 2px solid var(--color-gray-200);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.book-card-mini:hover,
+.collage-card-mini:hover {
+    transform: translateY(-4px);
+    border-color: var(--color-accent);
+}
+
+.book-card-mini img,
+.collage-card-mini img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+}
+
+.book-info,
+.collage-info {
+    padding: var(--spacing-2);
+}
+
+.book-info h3,
+.collage-info h3 {
+    font-family: var(--font-family-barcode);
+    font-size: var(--text-base);
+    color: var(--color-gray-600);
+    margin: 0 0 var(--spacing-1);
+}
+
+.book-year,
+.collage-date {
+    font-family: monospace;
+    color: var(--color-accent);
+    font-size: var(--text-sm);
+}
+
+@media (max-width: 768px) {
+    .diary-entry-meta {
+        flex-direction: column;
+        align-items: center;
+    }
+}
+
+.books-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-4);
+}
+
+.related-books,
+.related-collages {
+    background-color: var(--color-background);
+    border: 2px solid var(--color-gray-200);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-8);
+    box-shadow: var(--shadow-md);
+    margin-bottom: var(--spacing-8);
+} 

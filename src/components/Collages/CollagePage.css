@@ -1,0 +1,164 @@
+/* Remove debug borders and set only major structural borders */
+.collage-page * {
+    border: none;
+}
+
+/* Base container */
+.collage-page {
+    padding: 2rem 4rem;
+    max-width: 1800px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+/* Header section - more compact but still prominent */
+.collage-header {
+    text-align: center;
+    padding-bottom: 2rem;
+    border-bottom: 2px solid var(--color-gray-200);
+}
+
+.collage-header h1 {
+    font-family: var(--font-family-barcode);
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.collage-date {
+    font-size: 1rem;
+    color: var(--color-gray-500);
+}
+
+/* Main content grid - with clear division */
+.collage-content {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 3rem;
+}
+
+/* Books sidebar - with prominent separator */
+.books-sidebar {
+    padding-right: 2rem;
+    border-right: 2px solid var(--color-gray-200);
+}
+
+.books-sidebar h2 {
+    font-size: 1.25rem;
+    margin-bottom: 1.5rem;
+    color: var(--color-gray-700);
+}
+
+.books-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* Book cards - more compact but still clear */
+.book-card {
+    padding: 1rem;
+    background: white;
+    border-radius: 6px;
+    box-shadow: var(--shadow-sm);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.book-card:hover {
+    transform: translateX(0.5rem);
+    box-shadow: var(--shadow-md);
+}
+
+.book-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.book-card-header h3 {
+    font-size: 1rem;
+    color: var(--color-gray-800);
+    margin: 0;
+}
+
+.book-year {
+    font-size: 0.875rem;
+    color: var(--color-gray-500);
+}
+
+.book-card-content {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--color-gray-200);
+}
+
+.book-cover {
+    width: 100%;
+    max-width: 120px;
+    height: auto;
+    border-radius: 4px;
+    margin: 0.5rem 0;
+}
+
+.book-author {
+    font-size: 0.875rem;
+    color: var(--color-gray-600);
+    margin: 0.5rem 0;
+}
+
+.book-description {
+    font-size: 0.875rem;
+    color: var(--color-gray-700);
+    line-height: 1.5;
+    margin-top: 0.5rem;
+}
+
+/* Main content area */
+.collage-main {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.collage-image-container {
+    background: white;
+    border-radius: 8px;
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+}
+
+.collage-image {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.collage-description {
+    padding: 1.5rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: var(--shadow-sm);
+    line-height: 1.6;
+    color: var(--color-gray-700);
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+    .collage-page {
+        padding: 1.5rem;
+    }
+
+    .collage-content {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    .books-sidebar {
+        border-right: none;
+        border-bottom: 2px solid var(--color-gray-200);
+        padding-right: 0;
+        padding-bottom: 2rem;
+    }
+} 

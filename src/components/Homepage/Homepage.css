@@ -1,5 +1,10 @@
 .homepage {
+	max-width: 100%;
+	margin: 0 auto;
+}
+
+.section {
+	padding: var(--spacing-4);
 	max-width: 1200px;
 	margin: 0 auto;
-	padding: var(--spacing-4);
 }

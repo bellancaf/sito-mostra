@@ -20,6 +20,9 @@ const BooksTimeline: React.FC<BooksTimelineProps> = ({ books }) => {
         const width = timelineRef.current.clientWidth;
         const height = Math.max(600, books.length * 60);
 
+        const imageWidth = 60;  // Adjust size as needed
+        const imageHeight = 90; // Adjust size as needed
+
         const svg = d3.select(timelineRef.current)
             .attr('width', width)
             .attr('height', height);
@@ -77,19 +80,41 @@ const BooksTimeline: React.FC<BooksTimelineProps> = ({ books }) => {
         // Sort books by year
         const sortedBooks = [...books].sort((a, b) => a.publishYear - b.publishYear);
 
-        // Create simple black squares for books
-        const squareSize = 20; // Size of the squares
+        // Create patterns for book covers
+        const defs = svg.append('defs');
+        sortedBooks.forEach(book => {
+            defs.append('pattern')
+                .attr('id', `timeline-image-${book.id}`)
+                .attr('width', 1)
+                .attr('height', 1)
+                .append('image')
+                .attr('href', book.coverImage)
+                .attr('width', imageWidth)
+                .attr('height', imageHeight)
+                .attr('preserveAspectRatio', 'xMidYMid meet');
+        });
 
-        container.selectAll('.book-square')
+        // Create book cover rectangles
+        const bookGroups = container.selectAll('.book-group')
             .data(sortedBooks)
             .enter()
-            .append('rect')
-            .attr('class', 'book-square')
-            .attr('x', 20)
-            .attr('y', d => yScale(d.publishYear) - squareSize/2)
-            .attr('width', squareSize)
-            .attr('height', squareSize)
-            .attr('fill', '#000000');
+            .append('g')
+            .attr('class', 'book-group')
+            .attr('transform', d => `translate(20, ${yScale(d.publishYear) - imageHeight/2})`);
+
+        // Add the book covers
+        bookGroups.append('rect')
+            .attr('width', imageWidth)
+            .attr('height', imageHeight)
+            .attr('fill', d => `url(#timeline-image-${d.id})`)
+            .style('cursor', 'pointer')
+            .on('click', (event, d) => {
+                window.location.href = `/books/${d.id}`;
+            });
+
+        // Optional: Add hover effect with book title
+        bookGroups.append('title')
+            .text(d => `${d.title} (${d.publishYear})`);
 
     }, [books]);
 

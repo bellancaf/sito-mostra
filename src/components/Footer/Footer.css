@@ -12,41 +12,99 @@
 }
 
 .footer-container {
-    position: relative;
-    width: 100%;
-    background-color: #111827; /* Main color */
-    color: #ffffff; /* Text color */
-    padding: 10px 0; /* Space on top and bottom */
-    text-align: center;
-    box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.1); /* Minimal shadow for separation */
-    margin-top: auto; /* Ensure it stays at the bottom */
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    transform: translateY(100%);
+    transition: transform 1s ease-out;
+    z-index: var(--z-header);
+}
+
+.footer-container.visible {
+    transform: translateY(0);
+}
+
+.footer-container {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
 }
 
 .footer-content {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
+    background-color: var(--color-background);
+    padding: var(--spacing-2);
+    border-top: 2px solid var(--color-gray-200);
+    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(5px);
 }
 
 .footer-inner {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    justify-content: space-between;
     align-items: center;
+    position: relative;
+}
+
+/* Mobile styles */
+@media (max-width: 768px) {
+    .footer-inner {
+        margin: 0 var(--spacing-2);
+    }
+}
+
+/* Desktop styles */
+@media (min-width: 769px) {
+    .footer-inner {
+        margin: 0 var(--spacing-8);
+    }
 }
 
 .social-links {
-    margin-bottom: 10px; /* Space between social links and email */
+    display: flex;
+    flex-direction: row;
+    align-items: center;
 }
 
 .social-link {
-    margin: 0 10px;
-    transition: color 0.3s ease;
+    pointer-events: all;
+    z-index: 1000;
+}
+
+/* Mobile styles */
+@media (max-width: 768px) {
+    .social-link {
+        margin-right: var(--spacing-2);
+    }
+}
+
+/* Desktop styles */
+@media (min-width: 769px) {
+    .social-link {
+        margin-right: var(--spacing-4);
+    }
+}
+
+.icon {
+    pointer-events: none;
 }
 
 .email {
-    font-size: 14px;
+    color: var(--color-gray-600);
+    position: absolute;
+    right: 0;
+    text-align: center;
 }
 
 .email.mobile {
-    font-size: 12px;
+    left: var(--spacing-4);
+    font-size: var(--text-xs);
+}
+
+.email:not(.mobile) {
+    left: calc(-1 * var(--spacing-4));
+    font-size: var(--text-base);
 }

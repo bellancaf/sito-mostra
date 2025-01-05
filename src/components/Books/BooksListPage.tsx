@@ -48,6 +48,17 @@ const BooksListPage: React.FC = () => {
         // Clear any existing content
         svg.selectAll("*").remove();
 
+        // Add zoom behavior
+        const zoomBehavior = d3.zoom<SVGSVGElement, unknown>()
+            .scaleExtent([0.1, 4]) // Min and max zoom scale
+            .on('zoom', (event) => {
+                container.attr('transform', event.transform);
+            });
+
+        svg.call(zoomBehavior);
+
+        const container = svg.append('g');
+
         // Create nodes from books
         const nodes: NodeDatum[] = books.map(book => ({
             id: book.id,
@@ -97,10 +108,10 @@ const BooksListPage: React.FC = () => {
                 .attr('href', node.coverImage)
                 .attr('width', imageWidth)
                 .attr('height', imageHeight)
-                .attr('preserveAspectRatio', 'xMidYMid slice');
+                .attr('preserveAspectRatio', 'xMidYMid meet'); // Changed from 'slice' to 'meet'
         });
 
-        const link = svg.append('g')
+        const link = container.append('g')
             .selectAll('line')
             .data(links)
             .join('line')
@@ -108,7 +119,7 @@ const BooksListPage: React.FC = () => {
             .attr('stroke-opacity', 0.6)
             .attr('stroke-width', 1.5);
 
-        const nodeGroup = svg.append('g')
+        const nodeGroup = container.append('g')
             .selectAll('g')
             .data(nodes)
             .join('g');

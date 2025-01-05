@@ -3,38 +3,38 @@ import { Book, Collage, DiaryEntry } from '../types';
 export const books: Book[] = [
     {
         id: "1",
-        title: "The Metamorphosis",
-        author: "Franz Kafka",
-        publishYear: 1915,
-        coverImage: "/images/books/metamorphosis.jpg",
+        title: "La Guerre d'Algerie 54-62",
+        author: "Tresor",
+        publishYear: 1988,
+        coverImage: "/images/books/la_guerre_dalgerie_54-62.jpg",
         description: "A salesman wakes up one morning to find himself transformed into a giant insect.",
         collageIds: ["1", "3"]
     },
     {
         id: "2",
-        title: "The Trial",
-        author: "Franz Kafka",
-        publishYear: 1925,
-        coverImage: "/images/books/the-trial.jpg",
+        title: "Parcours Enchantés",
+        author: "Gilles Beutrolles",
+        publishYear: 2010,
+        coverImage: "/images/books/parcours_enchantes.jpg",
         description: "A man is arrested and prosecuted by a remote authority without ever knowing the crime he committed.",
         collageIds: ["1"]
     },
     {
         id: "3",
-        title: "Notes from Underground",
-        author: "Fyodor Dostoevsky",
-        publishYear: 1864,
-        coverImage: "/images/books/notes-underground.jpg",
-        description: "The memoirs of an unnamed narrator who has withdrawn from society into an underground existence.",
+        title: "Algerie Guerre Sans Images",
+        author: "Michel von Graffenried",
+        publishYear: 1980,
+        coverImage: "/images/books/algerie_guerre_sans_images.jpg",
+        description: "A photobook about the Algerian war",
         collageIds: ["2"]
     },
     {
         id: "4",
-        title: "The Castle",
-        author: "Franz Kafka",
-        publishYear: 1926,
-        coverImage: "/images/books/the-castle.jpg",
-        description: "A land surveyor known as K. arrives in a village and struggles to gain access to the mysterious authorities who govern it from a castle.",
+        title: "Les années mémoire 1920",
+        author: "Larousse",
+        publishYear: 1987,
+        coverImage: "/images/books/les_annees_memoire_1920.jpg",
+        description: "A fun recollection of the 1920s",
         collageIds: ["2", "3"]
     },
     {
@@ -42,7 +42,7 @@ export const books: Book[] = [
         title: "Floorplan via degli oleandri",
         author: "Unknown",
         publishYear: 1960,
-        coverImage: "/images/books/floorplan.jpg",
+        coverImage: "/images/books/condono_via_oleandri.jpg",
         description: "Architectural floorplan of via degli oleandri.",
         collageIds: []
     },
@@ -51,8 +51,8 @@ export const books: Book[] = [
         title: "London Zine",
         author: "Various",
         publishYear: 2023,
-        coverImage: "/images/books/london-zine.jpg", 
-        description: "A smart and heartfelt zine discovered in a Dalston bookshop.",
+        coverImage: "/images/books/programming_zine.jpg", 
+        description: "A smart and heartfelt cyberfeminist zine discovered in a Dalston bookshop.",
         collageIds: []
     }
 ];

@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+
 import NavBar from './components/Navbar/NavBar';
 import Footer from './components/Footer/Footer';
 import Homepage from './components/Homepage/Homepage';
@@ -9,6 +10,9 @@ import BooksListPage from './components/Books/BooksListPage';
 import BookPage from './components/Books/BookPage';
 import DiaryListPage from './components/Diary/DiaryListPage';
 import DiaryEntryPage from './components/Diary/DiaryEntryPage';
+
+import './App.css';
+import './styles/main.css'
 
 const App: React.FC = () => {
     const [isNavbarVisible, setIsNavbarVisible] = React.useState(true);

@@ -1,7 +1,6 @@
 .expandable-book-card {
     background: white;
     border: 2px solid var(--color-gray-200);
-    border-radius: var(--radius-lg);
     overflow: hidden;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -25,7 +24,6 @@
     width: 100px;
     height: 150px;
     object-fit: cover;
-    border-radius: var(--radius-md);
 }
 
 .book-preview-info {
@@ -35,13 +33,14 @@
 }
 
 .book-preview-info h3 {
-    font-family: var(--font-family-barcode);
+    font-family: monospace;
     font-size: var(--text-xl);
     color: var(--color-gray-600);
     margin: 0;
 }
 
 .expand-icon {
+    font-family: monospace;
     font-size: var(--text-2xl);
     color: var(--color-accent);
     width: 24px;
@@ -58,6 +57,7 @@
 }
 
 .book-description {
+    font-family: monospace;
     color: var(--color-gray-500);
     line-height: 1.6;
     margin-bottom: var(--spacing-4);
@@ -69,7 +69,6 @@
     background-color: var(--color-accent);
     color: white;
     text-decoration: none;
-    border-radius: var(--radius-md);
     transition: background-color 0.3s ease;
 }
 

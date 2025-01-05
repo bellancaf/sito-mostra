@@ -15,7 +15,6 @@
 .diary-entry-main {
     background: var(--color-background);
     border: 2px solid var(--color-gray-200);
-    border-radius: var(--radius-lg);
     padding: var(--spacing-8);
     margin-bottom: var(--spacing-8);
 }
@@ -80,22 +79,8 @@
     margin-bottom: var(--spacing-4);
 }
 
-.books-grid,
-.collages-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: var(--spacing-4);
-}
 
-.book-card-mini,
-.collage-card-mini {
-    text-decoration: none;
-    background: var(--color-background);
-    border: 2px solid var(--color-gray-200);
-    border-radius: var(--radius-md);
-    overflow: hidden;
-    transition: all 0.3s ease;
-}
+
 
 .book-card-mini:hover,
 .collage-card-mini:hover {
@@ -115,13 +100,7 @@
     padding: var(--spacing-2);
 }
 
-.book-info h3,
-.collage-info h3 {
-    font-family: var(--font-family-barcode);
-    font-size: var(--text-base);
-    color: var(--color-gray-600);
-    margin: 0 0 var(--spacing-1);
-}
+
 
 .book-year,
 .collage-date {
@@ -147,7 +126,6 @@
 .related-collages {
     background-color: var(--color-background);
     border: 2px solid var(--color-gray-200);
-    border-radius: var(--radius-lg);
     padding: var(--spacing-8);
     box-shadow: var(--shadow-md);
     margin-bottom: var(--spacing-8);

@@ -1,0 +1,24 @@
+.books-timeline {
+    width: 100%;
+    background: white;
+    border: 2px solid #000000;
+    margin-top: 2rem;
+    overflow-y: auto;
+    padding: 2rem;
+}
+
+.timeline-line {
+    stroke: #000000;
+    stroke-width: 2px;
+}
+
+.year-marker line {
+    stroke: #000000;
+    stroke-width: 1px;
+}
+
+.year-marker text {
+    font-family: monospace;
+    font-size: 14px;
+    fill: #000000;
+} 

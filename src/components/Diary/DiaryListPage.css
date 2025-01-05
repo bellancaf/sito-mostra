@@ -5,7 +5,7 @@
 }
 
 .diary-title {
-    font-family: var(--font-family-barcode);
+    font-family: monospace;
     font-size: var(--text-4xl);
     color: var(--color-gray-600);
     margin-bottom: var(--spacing-8);
@@ -21,7 +21,6 @@
     text-decoration: none;
     background: var(--color-background);
     border: 2px solid var(--color-gray-200);
-    border-radius: var(--radius-lg);
     overflow: hidden;
     transition: all 0.3s ease;
     opacity: 0;
@@ -78,13 +77,14 @@
 }
 
 .diary-card h2 {
-    font-family: var(--font-family-barcode);
+    font-family: monospace;
     font-size: var(--text-2xl);
     color: var(--color-gray-600);
     margin: 0 0 var(--spacing-4);
 }
 
 .diary-card p {
+    font-family: monospace;
     color: var(--color-gray-500);
     line-height: 1.6;
     margin: 0;

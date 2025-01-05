@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { books, getCollagesForBook } from '../../data';
 import * as d3 from 'd3';
 import './BooksListPage.css';
-import ExpandableBookCard from './components/ExpandableBookCard';
+import BooksTimeline from './components/BooksTimeline';
 
 interface NodeDatum {
     id: string;
@@ -21,15 +21,17 @@ interface LinkDatum {
     target: NodeDatum;
 }
 
+type ViewMode = 'grid' | 'network' | 'timeline';
+
 const BooksListPage: React.FC = () => {
-    const [isGridView, setIsGridView] = useState(true);
+    const [viewMode, setViewMode] = useState<ViewMode>('grid');
     const networkRef = useRef<SVGSVGElement | null>(null);
 
     useEffect(() => {
-        if (!isGridView) {
+        if (viewMode === 'network') {
             createNetworkVisualization();
         }
-    }, [isGridView]);
+    }, [viewMode]);
 
     const createNetworkVisualization = () => {
         if (!networkRef.current) return;
@@ -190,34 +192,61 @@ const BooksListPage: React.FC = () => {
     };
 
     return (
-        <div className="books-list-page">
-            <h1 className="books-title">Library</h1>
+        <div className="books-container">
+            <h1 className="books-title">Books</h1>
             
-            <div className="view-toggle">
-                <span className={`toggle-label ${isGridView ? 'active' : ''}`}>
-                    Grid View
-                </span>
-                <label className="toggle-switch">
-                    <input
-                        type="checkbox"
-                        checked={!isGridView}
-                        onChange={() => setIsGridView(!isGridView)}
-                    />
-                    <span className="toggle-slider"></span>
-                </label>
-                <span className={`toggle-label ${!isGridView ? 'active' : ''}`}>
-                    Network View
-                </span>
+            <div className="view-controls">
+                <button 
+                    className={`view-button ${viewMode === 'grid' ? 'active' : ''}`}
+                    onClick={() => setViewMode('grid')}
+                >
+                    grid
+                </button>
+                <button 
+                    className={`view-button ${viewMode === 'network' ? 'active' : ''}`}
+                    onClick={() => setViewMode('network')}
+                >
+                    network
+                </button>
+                <button 
+                    className={`view-button ${viewMode === 'timeline' ? 'active' : ''}`}
+                    onClick={() => setViewMode('timeline')}
+                >
+                    timeline
+                </button>
             </div>
 
-            {isGridView ? (
-                <div className="books-list">
-                    {books.map((book) => (
-                        <ExpandableBookCard key={book.id} book={book} />
+            {viewMode === 'grid' && (
+                <div className="books-grid">
+                    {books.map(book => (
+                        <Link 
+                            to={`/books/${book.id}`} 
+                            key={book.id}
+                            className="book-card"
+                        >
+                            <div className="book-cover-container">
+                                <img 
+                                    src={book.coverImage} 
+                                    alt={book.title} 
+                                    className="book-cover"
+                                />
+                            </div>
+                            <div className="book-info">
+                                <h2>{book.title}</h2>
+                                <span className="book-author">{book.author}</span>
+                                <span className="book-year">{book.publishYear}</span>
+                            </div>
+                        </Link>
                     ))}
                 </div>
-            ) : (
+            )}
+            
+            {viewMode === 'network' && (
                 <svg ref={networkRef} className="books-network"></svg>
+            )}
+            
+            {viewMode === 'timeline' && (
+                <BooksTimeline books={books} />
             )}
         </div>
     );

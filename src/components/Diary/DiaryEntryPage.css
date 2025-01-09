@@ -127,6 +127,5 @@
     background-color: var(--color-background);
     border: 2px solid var(--color-gray-200);
     padding: var(--spacing-8);
-    box-shadow: var(--shadow-md);
     margin-bottom: var(--spacing-8);
 } 

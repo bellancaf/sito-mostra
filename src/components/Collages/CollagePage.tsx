@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { getCollage, getRelatedBooks } from '../../data';
 import { Book } from '../../types';
 import './CollagePage.css';
@@ -60,13 +60,15 @@ const CollagePage: React.FC = () => {
                                     
                                     {expandedBookId === book.id && (
                                         <div className="book-card-content">
-                                            <img 
-                                                src={book.coverImage} 
-                                                alt={book.title} 
-                                                className="book-cover"
-                                            />
                                             <p className="book-author">by {book.author}</p>
                                             <p className="book-description">{book.description}</p>
+                                            <Link 
+                                                to={`/books/${book.id}`} 
+                                                className="read-more-link"
+                                                onClick={(e) => e.stopPropagation()}
+                                            >
+                                                Read more →
+                                            </Link>
                                         </div>
                                     )}
                                 </div>

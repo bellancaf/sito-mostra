@@ -40,7 +40,6 @@ const App: React.FC = () => {
                         <Route path="/diary/:id" element={<DiaryEntryPage />} />
                     </Routes>
                 </main>
-                <Footer />
             </div>
         </Router>
     );

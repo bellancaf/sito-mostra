@@ -20,11 +20,10 @@
     width: 100%;
     display: flex;
     align-items: center;
-    background-color: var(--color-background);
+    background-color: transparent;
     padding: var(--spacing-2) 0;
     border-bottom: 2px solid var(--color-gray-200);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    backdrop-filter: blur(5px);
+    backdrop-filter: none;
 }
 
 .brand-logo {
@@ -46,28 +45,28 @@
 .navbar-links {
     display: flex;
     margin-left: auto;
-    margin-right: var(--spacing-8);
+    margin-right: var(--spacing-6);
     align-items: center;
 }
 
 .navbar-links ul {
     display: flex;
-    gap: var(--spacing-12);
+    gap: var(--spacing-6);
     list-style: none;
     margin: 0;
     padding: 0;
 }
 
-/* New styles for nav link container */
+/* Base nav link styles */
 .nav-link-container {
     display: flex;
     flex-direction: column;
     align-items: center;
     text-decoration: none;
     gap: var(--spacing-1);
-    padding: var(--spacing-2) var(--spacing-4);
-    border: 2px solid transparent;
-    transition: all 0.3s ease;
+    padding: var(--spacing-2) var(--spacing-2);
+    position: relative;
+    border-bottom: none;
 }
 
 .nav-link-container.mobile {
@@ -78,15 +77,31 @@
 /* Barcode text styles */
 .barcode-text {
     font-family: var(--font-family-barcode);
-    font-size: var(--text-4xl);
-    color: var(--color-gray-600);
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-gray-900);
     line-height: 1;
-    opacity: 0.7;
-    transition: opacity 0.3s ease;
+    opacity: 0.85;
+    transition: all 0.3s ease;
+    margin-left: var(--spacing-2);
+    letter-spacing: -0.02em;
 }
 
+/* Hover state - black text */
 .nav-link-container:hover .barcode-text {
     opacity: 1;
+    color: var(--color-gray-900);
+}
+
+/* Active state - blue text */
+.nav-link-container.active .barcode-text {
+    opacity: 1;
+    color: var(--color-accent);
+}
+
+/* Make sure active state takes precedence even on hover */
+.nav-link-container.active:hover .barcode-text {
+    color: var(--color-accent);
 }
 
 .theme-controls {
@@ -140,8 +155,8 @@
         left: -200px;
         width: 200px;
         height: 100%;
-        background-color: var(--color-background);
-        backdrop-filter: blur(15px);
+        background-color: transparent;
+        backdrop-filter: none;
         transition: transform 0.3s ease;
         padding-top: var(--spacing-8);
         z-index: 1000;
@@ -161,7 +176,7 @@
 
     /* Mobile barcode text adjustments */
     .barcode-text {
-        font-size: var(--text-3xl);
+        font-size: var(--text-xl);
     }
 
     .nav-link-container {
@@ -190,10 +205,50 @@
         opacity: 1;
         pointer-events: all;
     }
+
+    .nav-link-container.mobile::before {
+        left: 0.5rem;
+    }
+    
+    .nav-link-container.mobile .barcode-text {
+        margin-left: var(--spacing-6);
+    }
 }
 
+/* Add dot styles */
+.nav-link-container::before {
+    content: '';
+    position: absolute;
+    left: -0.25rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+/* Hover state - black dot */
+.nav-link-container:hover::before {
+    opacity: 1;
+    background-color: var(--color-gray-900);
+}
+
+/* Active state - blue dot */
+.nav-link-container.active::before {
+    opacity: 1;
+    background-color: var(--color-accent);
+}
+
+/* Make sure active state takes precedence even on hover */
+.nav-link-container.active:hover::before {
+    background-color: var(--color-accent);
+}
+
+/* Remove the old hover and active styles */
 .nav-link-container:hover {
-    border-color: var(--color-accent);
-    background-color: var(--color-background);
-    border-radius: var(--radius-md);
+    background-color: transparent;
+    border-radius: 0;
+    border-bottom: none;
 }

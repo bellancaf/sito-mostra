@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import './NavBar.css';
 
 interface NavBarProps {
@@ -10,6 +10,7 @@ const NavBar: React.FC<NavBarProps> = ({ isNavbarVisible }) => {
     const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
     const [isVisible, setIsVisible] = useState(false);
+    const location = useLocation();
 
     const toggleMobileMenu = () => {
         setMobileMenuOpen(!isMobileMenuOpen);
@@ -46,7 +47,7 @@ const NavBar: React.FC<NavBarProps> = ({ isNavbarVisible }) => {
                     to={item.path}
                     className={`nav-link-container ${
                         isMobileView ? 'mobile' : ''
-                    }`}
+                    } ${location.pathname.startsWith(item.path) ? 'active' : ''}`}
                     onClick={isMobileView ? toggleMobileMenu : undefined}
                 >
                     <span className="barcode-text">{item.label}</span>

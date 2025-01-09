@@ -28,7 +28,6 @@
     aspect-ratio: 2/3;
     object-fit: cover;
     border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-lg);
 }
 
 .book-info {
@@ -101,7 +100,6 @@
     text-decoration: none;
     background: var(--color-background);
     border: 2px solid var(--color-gray-200);
-    border-radius: var(--radius-md);
     overflow: hidden;
     transition: all 0.3s ease;
 }
@@ -121,7 +119,6 @@
     text-decoration: none;
     background: var(--color-background);
     border: 2px solid var(--color-gray-200);
-    border-radius: var(--radius-md);
     padding: var(--spacing-4);
     transition: all 0.3s ease;
 }

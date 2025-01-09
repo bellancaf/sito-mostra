@@ -4,7 +4,6 @@
     overflow: hidden;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: var(--shadow-md);
 }
 
 .expandable-book-card:hover {

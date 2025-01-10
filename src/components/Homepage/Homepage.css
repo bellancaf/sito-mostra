@@ -111,6 +111,7 @@
 	padding: 0 2rem;
 	margin-bottom: 3rem;
 	font-family: var(--font-family-barcode);
+	color: var(--color-text);
 }
 
 .network-intro h2 {
@@ -118,12 +119,14 @@
 	font-size: 2.5rem;
 	margin-bottom: 1.5rem;
 	font-weight: bold;
+	color: var(--color-text);
 }
 
 .network-intro p {
 	font-size: 1rem;
 	line-height: 1.4;
 	max-width: 600px;
+	color: var(--color-text);
 }
 
 .network-intro .filter-item {
@@ -150,6 +153,7 @@
 	margin-left: 4px;
 	line-height: inherit;
 	display: inline-block;
+	color: var(--color-text);
 }
 
 .network-node {
@@ -158,4 +162,8 @@
 
 .network-link {
 	transition: opacity 0.3s ease;
+}
+
+.filter-item.inactive .filter-label {
+	color: var(--color-gray-500);
 }

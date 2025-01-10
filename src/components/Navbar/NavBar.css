@@ -72,12 +72,12 @@
     padding: var(--spacing-2) var(--spacing-4);
 }
 
-/* Barcode text styles */
+/* Barcode text styles - Light mode */
 .barcode-text {
     font-family: var(--font-family-barcode);
     font-size: var(--text-base);
     font-weight: 600;
-    color: var(--color-gray-900);
+    color: black;
     line-height: 1;
     opacity: 0.85;
     transition: all 0.3s ease;
@@ -85,21 +85,73 @@
     letter-spacing: -0.02em;
 }
 
-/* Hover state - black text */
+/* Hover state - Light mode */
 .nav-link-container:hover .barcode-text {
     opacity: 1;
-    color: var(--color-gray-900);
+    color: black;
 }
 
-/* Active state - blue text */
+/* Active state - Light mode */
 .nav-link-container.active .barcode-text {
     opacity: 1;
     color: var(--color-accent);
 }
 
+/* Dark mode text styles */
+:root.dark-mode .barcode-text {
+    color: white;
+}
+
+:root.dark-mode .nav-link-container:hover .barcode-text {
+    color: white;
+}
+
+:root.dark-mode .nav-link-container.active .barcode-text {
+    color: var(--color-accent);
+}
+
+/* Dot styles */
+.nav-link-container::before {
+    content: '';
+    position: absolute;
+    left: -0.25rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+/* Hover state dot - Light mode */
+.nav-link-container:hover::before {
+    opacity: 1;
+    background-color: black;
+}
+
+/* Active state dot - Light mode */
+.nav-link-container.active::before {
+    opacity: 1;
+    background-color: var(--color-accent);
+}
+
+/* Dark mode dot styles */
+:root.dark-mode .nav-link-container:hover::before {
+    background-color: white;
+}
+
+:root.dark-mode .nav-link-container.active::before {
+    background-color: var(--color-accent);
+}
+
 /* Make sure active state takes precedence even on hover */
 .nav-link-container.active:hover .barcode-text {
     color: var(--color-accent);
+}
+
+.nav-link-container.active:hover::before {
+    background-color: var(--color-accent);
 }
 
 .theme-controls {
@@ -211,37 +263,6 @@
     .nav-link-container.mobile .barcode-text {
         margin-left: var(--spacing-6);
     }
-}
-
-/* Add dot styles */
-.nav-link-container::before {
-    content: '';
-    position: absolute;
-    left: -0.25rem;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 4px;
-    height: 4px;
-    border-radius: 50%;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-/* Hover state - black dot */
-.nav-link-container:hover::before {
-    opacity: 1;
-    background-color: var(--color-gray-900);
-}
-
-/* Active state - blue dot */
-.nav-link-container.active::before {
-    opacity: 1;
-    background-color: var(--color-accent);
-}
-
-/* Make sure active state takes precedence even on hover */
-.nav-link-container.active:hover::before {
-    background-color: var(--color-accent);
 }
 
 /* Remove the old hover and active styles */

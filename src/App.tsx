@@ -14,36 +14,39 @@ import StatementPage from './components/Statement/StatementPage';
 
 import './App.css';
 import './styles/main.css'
+import { ThemeProvider } from './context/ThemeContext';
 
 const App: React.FC = () => {
     const [isNavbarVisible, setIsNavbarVisible] = React.useState(true);
 
     return (
-        <Router>
-            <div className="app">
-                <NavBar isNavbarVisible={isNavbarVisible} />
-                <main>
-                    <Routes>
-                        <Route 
-                            path="/" 
-                            element={
-                                <Homepage 
-                                    setIsNavbarVisible={setIsNavbarVisible}
-                                    isNavbarVisible={isNavbarVisible}
-                                />
-                            } 
-                        />
-                        <Route path="/collages" element={<CollagesPage />} />
-                        <Route path="/collages/:id" element={<CollagePage />} />
-                        <Route path="/books" element={<BooksListPage />} />
-                        <Route path="/books/:id" element={<BookPage />} />
-                        <Route path="/diary" element={<DiaryListPage />} />
-                        <Route path="/diary/:id" element={<DiaryEntryPage />} />
-                        <Route path="/statement" element={<StatementPage />} />
-                    </Routes>
-                </main>
-            </div>
-        </Router>
+        <ThemeProvider>
+            <Router>
+                <div className="app">
+                    <NavBar isNavbarVisible={isNavbarVisible} />
+                    <main>
+                        <Routes>
+                            <Route 
+                                path="/" 
+                                element={
+                                    <Homepage 
+                                        setIsNavbarVisible={setIsNavbarVisible}
+                                        isNavbarVisible={isNavbarVisible}
+                                    />
+                                } 
+                            />
+                            <Route path="/collages" element={<CollagesPage />} />
+                            <Route path="/collages/:id" element={<CollagePage />} />
+                            <Route path="/books" element={<BooksListPage />} />
+                            <Route path="/books/:id" element={<BookPage />} />
+                            <Route path="/diary" element={<DiaryListPage />} />
+                            <Route path="/diary/:id" element={<DiaryEntryPage />} />
+                            <Route path="/statement" element={<StatementPage />} />
+                        </Routes>
+                    </main>
+                </div>
+            </Router>
+        </ThemeProvider>
     );
 };
 

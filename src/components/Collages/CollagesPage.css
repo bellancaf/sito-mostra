@@ -29,7 +29,7 @@
     font-size: var(--text-4xl);
     margin-bottom: var(--spacing-2);
     font-family: var(--font-family-barcode);
-    color: var(--color-gray-900);
+    color: var(--color-text);
 }
 
 .collages-description {
@@ -50,7 +50,7 @@
 
 .view-option:hover {
     opacity: 1;
-    color: var(--color-gray-900);
+    color: var(--color-text);
 }
 
 .view-option.active {
@@ -69,7 +69,7 @@
 .collage-card {
     text-decoration: none;
     color: inherit;
-    background: var(--color-white);
+    background: var(--color-background);
     border: 2px solid var(--color-gray-200);
     overflow: hidden;
     transition: all 0.3s ease;
@@ -102,13 +102,14 @@
     display: flex;
     flex-direction: column;
     gap: var(--spacing-2);
+    background-color: var(--color-background);
 }
 
 .collage-info h2 {
     font-family: var(--font-family-barcode);
     margin: 0;
     font-size: var(--text-lg);
-    color: var(--color-gray-900);
+    color: var(--color-text);
     line-height: 1.2;
     opacity: 0.85;
 }

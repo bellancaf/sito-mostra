@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import ThemeSwitch from '../common/ThemeSwitch';
 import './NavBar.css';
 
 interface NavBarProps {
@@ -86,6 +87,9 @@ const NavBar: React.FC<NavBarProps> = ({ isNavbarVisible }) => {
                             <div className="navbar-links">
                                 <ul>
                                     {renderNavLinks()}
+                                    <li>
+                                        <ThemeSwitch />
+                                    </li>
                                 </ul>
                             </div>
                         </div>

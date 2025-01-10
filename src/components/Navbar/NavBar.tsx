@@ -39,6 +39,7 @@ const NavBar: React.FC<NavBarProps> = ({ isNavbarVisible }) => {
 
 	const renderNavLinks = (isMobileView: boolean = false) => {
         return [
+            { path: '/', label: 'home' },
             { path: '/collages', label: 'collages' },
             { path: '/books', label: 'library' },
             { path: '/diary', label: 'diary' },
@@ -49,7 +50,7 @@ const NavBar: React.FC<NavBarProps> = ({ isNavbarVisible }) => {
                     to={item.path}
                     className={`nav-link-container ${
                         isMobileView ? 'mobile' : ''
-                    } ${location.pathname.startsWith(item.path) ? 'active' : ''}`}
+                    } ${location.pathname === item.path ? 'active' : ''}`}
                     onClick={isMobileView ? toggleMobileMenu : undefined}
                 >
                     <span className="barcode-text">{item.label}</span>
@@ -64,20 +65,14 @@ const NavBar: React.FC<NavBarProps> = ({ isNavbarVisible }) => {
                 <>
                     <nav className={`navbar ${isVisible ? 'visible' : ''}`}>
                         <div className="navbar-container">
-                            <div className="navbar-brand">
-                                <Link to="/">
-                                    <img 
-                                        src="/images/logo-dark.png" 
-                                        alt="Brand Logo" 
-                                        className={`brand-logo ${isMobile ? 'mobile' : ''}`}
-                                    />
-                                </Link>
+                            <div className="theme-switch-container">
+                                <ThemeSwitch />
                             </div>
 
                             {/* Mobile Menu Button */}
                             <div className={`navbar-toggle ${isMobileMenuOpen ? 'open' : ''}`} 
-									onClick={toggleMobileMenu} 
-									aria-label="Toggle mobile menu">
+                                onClick={toggleMobileMenu} 
+                                aria-label="Toggle mobile menu">
                                 {[0, 1, 2].map((_, index) => (
                                     <span key={index} className="hamburger"></span>
                                 ))}
@@ -87,9 +82,6 @@ const NavBar: React.FC<NavBarProps> = ({ isNavbarVisible }) => {
                             <div className="navbar-links">
                                 <ul>
                                     {renderNavLinks()}
-                                    <li>
-                                        <ThemeSwitch />
-                                    </li>
                                 </ul>
                             </div>
                         </div>

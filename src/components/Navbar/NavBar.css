@@ -24,16 +24,9 @@
     backdrop-filter: none;
 }
 
-.brand-logo {
-    width: 60px;
-    height: 60px;
-    padding-left: var(--spacing-8);
-    object-fit: contain;
-}
-
+.brand-logo,
 .brand-logo.mobile {
-    width: 10%;
-    height: 10%;
+    display: none;
 }
 
 .navbar-toggle {
@@ -270,4 +263,8 @@
     background-color: transparent;
     border-radius: 0;
     border-bottom: none;
+}
+
+.theme-switch-container {
+    padding-left: var(--spacing-8);
 }

@@ -8,7 +8,13 @@ export const books: Book[] = [
         publishYear: 1988,
         coverImage: "/images/books/la_guerre_dalgerie_54-62.jpg",
         description: "A salesman wakes up one morning to find himself transformed into a giant insect.",
-        diaryIds: ["diary2", "diary3"]
+        diaryIds: ["diary2", "diary3"],
+        location: {
+            country: "France",
+            city: "Paris",
+            coordinates: [48.8566, 2.3522],
+            name: "Marché aux Puces de Saint-Ouen"
+        }
     },
     {
         id: "2",
@@ -17,7 +23,13 @@ export const books: Book[] = [
         publishYear: 2010,
         coverImage: "/images/books/parcours_enchantes.jpg",
         description: "A man is arrested and prosecuted by a remote authority without ever knowing the crime he committed.",
-        diaryIds: ["diary1"]
+        diaryIds: ["diary1"],
+        location: {
+            country: "France",
+            city: "Paris",
+            coordinates: [48.8566, 2.3522],
+            name: "Shakespeare and Company"
+        }
     },
     {
         id: "3",
@@ -26,7 +38,13 @@ export const books: Book[] = [
         publishYear: 1980,
         coverImage: "/images/books/algerie_guerre_sans_images.jpg",
         description: "A photobook about the Algerian war",
-        diaryIds: ["diary3"]
+        diaryIds: ["diary3"],
+        location: {
+            country: "France",
+            city: "Paris",
+            coordinates: [48.8566, 2.3522],
+            name: "Librairie des Archives"
+        }
     },
     {
         id: "4",
@@ -35,7 +53,13 @@ export const books: Book[] = [
         publishYear: 1987,
         coverImage: "/images/books/les_annees_memoire_1920.jpg",
         description: "A fun recollection of the 1920s",
-        diaryIds: ["diary1"]
+        diaryIds: ["diary1"],
+        location: {
+            country: "France",
+            city: "Dunkirk",
+            coordinates: [51.0343, 2.3767],
+            name: "Marché aux Puces de Dunkerque"
+        }
     },
     {
         id: "5", 
@@ -44,7 +68,13 @@ export const books: Book[] = [
         publishYear: 1960,
         coverImage: "/images/books/condono_via_oleandri.jpg",
         description: "Architectural floorplan of via degli oleandri.",
-        diaryIds: []
+        diaryIds: [],
+        location: {
+            country: "Italy",
+            city: "Sassetta",
+            coordinates: [43.0733, 10.6447],
+            name: "Nonna Albina's House"
+        }
     },
     {
         id: "6",
@@ -53,7 +83,13 @@ export const books: Book[] = [
         publishYear: 2023,
         coverImage: "/images/books/programming_zine.jpg", 
         description: "A smart and heartfelt cyberfeminist zine discovered in a Dalston bookshop.",
-        diaryIds: ["diary1"]
+        diaryIds: ["diary1"],
+        location: {
+            country: "UK",
+            city: "London",
+            coordinates: [51.5449, -0.0746],
+            name: "Dalston Bookshop"
+        }
     },
     {
         id: "7",
@@ -62,7 +98,13 @@ export const books: Book[] = [
         publishYear: 1927,
         coverImage: "/images/books/noi_mondo_nov_27.jpg", 
         description: "November 1927, a number of articles on <races>, some fun comments on the italian cinema production and a deep dive on living on an oil ship and what was the fashion about beards and man hairstyle. There's also a little commentary on women's wearing pants.",
-        diaryIds: ["diary4"]
+        diaryIds: ["diary4"],
+        location: {
+            country: "Italy",
+            city: "Rome",
+            coordinates: [41.9028, 12.4964],
+            name: "Rome Warehouse Shop"
+        }
     },
     {
         id: "8",
@@ -71,7 +113,13 @@ export const books: Book[] = [
         publishYear: 1960,
         coverImage: "/images/books/photos_rome_1960.jpg", 
         description: "So interestingly similar, the poses, the places, the clothes. Some scribbles on the back help me navigate some of it but not much more to go by.",
-        diaryIds: ["diary4"]
+        diaryIds: ["diary4"],
+        location: {
+            country: "Italy",
+            city: "Sassetta",
+            coordinates: [43.0733, 10.6447],
+            name: "Nonna Albina's House"
+        }
     },
     {
         id: "9",
@@ -80,7 +128,13 @@ export const books: Book[] = [
         publishYear: 1972,
         coverImage: "/images/books/revue_mondiale_1970.jpg", 
         description: "A review of 1970. A recent history work published in 1972, a fantastic insight of what the institutionalised media in France thought of the world.",
-        diaryIds: ["diary4"]
+        diaryIds: ["diary4"],
+        location: {
+            country: "Italy",
+            city: "Livorno",
+            coordinates: [43.5485, 10.3106],
+            name: "Second-hand Store near Basketball Arena"
+        }
     },
     {
         id: "10",
@@ -89,7 +143,13 @@ export const books: Book[] = [
         publishYear: 1970,
         coverImage: "/images/books/histoire_vecue_de_la_resistance.jpg", 
         description: "An amazing collection of small zines, found letters, newspapers and other documents. It tells the story of the resistence in France during WWII. Definitely part of the effort to talk about how everyonie was part of the resistance and nobody was collaborating but still...",
-        diaryIds: ["diary4"]
+        diaryIds: ["diary4"],
+        location: {
+            country: "Italy",
+            city: "Rome",
+            coordinates: [41.9028, 12.4964],
+            name: "Accademia Book Market"
+        }
     },
     {
         id: "11",

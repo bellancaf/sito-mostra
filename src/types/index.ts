@@ -1,11 +1,19 @@
+export interface Location {
+    country: string;
+    city: string;
+    coordinates: [number, number]; // [latitude, longitude]
+    name: string;
+}
+
 export interface Book {
     id: string;
     title: string;
+    author: string;
     publishYear: number;
     coverImage: string;
     description: string;
-    author: string;
-    diaryIds: string[];  // References to diary entries that mention this book
+    diaryIds: string[];
+    location?: Location; // Making it optional since some books might not have location data
 }
 
 export interface Collage {

@@ -3,11 +3,12 @@ import { useParams, Link } from 'react-router-dom';
 import { getDiaryEntry, getRelatedBooks, getCollagesForDiaryEntry } from '../../data';
 import { Collage } from '../../types';
 import './DiaryEntryPage.css';
-import ExpandableBookCard from '../Books/components/ExpandableBookCard';
+import Breadcrumbs from '../common/Breadcrumbs';
 
 const DiaryEntryPage: React.FC = () => {
     const { id } = useParams();
     const [isVisible, setIsVisible] = useState(false);
+    const [expandedBookId, setExpandedBookId] = useState<string | null>(null);
     const entry = getDiaryEntry(id || '');
     
     useEffect(() => {
@@ -19,8 +20,19 @@ const DiaryEntryPage: React.FC = () => {
     const relatedBooks = getRelatedBooks(entry.bookIds);
     const relatedCollages = getCollagesForDiaryEntry(entry.id);
 
+    const toggleBook = (bookId: string) => {
+        setExpandedBookId(expandedBookId === bookId ? null : bookId);
+    };
+
     return (
         <div className={`diary-entry-page ${isVisible ? 'visible' : ''}`}>
+            <Breadcrumbs 
+                items={[
+                    { label: 'diary', path: '/diary' },
+                    { label: entry.title }
+                ]} 
+            />
+            
             <article className="diary-entry-main">
                 <header className="diary-entry-header">
                     <div className="diary-entry-meta">
@@ -46,7 +58,30 @@ const DiaryEntryPage: React.FC = () => {
                         <h2>Books Mentioned</h2>
                         <div className="books-list">
                             {relatedBooks.map(book => (
-                                <ExpandableBookCard key={book.id} book={book} />
+                                <div 
+                                    key={book.id} 
+                                    className={`book-card ${expandedBookId === book.id ? 'expanded' : ''}`}
+                                    onClick={() => toggleBook(book.id)}
+                                >
+                                    <div className="book-card-header">
+                                        <h3>{book.title}</h3>
+                                        <span className="book-year">{book.publishYear}</span>
+                                    </div>
+                                    
+                                    {expandedBookId === book.id && (
+                                        <div className="book-card-content">
+                                            <p className="book-author">by {book.author}</p>
+                                            <p className="book-description">{book.description}</p>
+                                            <Link 
+                                                to={`/books/${book.id}`} 
+                                                className="read-more-link"
+                                                onClick={(e) => e.stopPropagation()}
+                                            >
+                                                Read more →
+                                            </Link>
+                                        </div>
+                                    )}
+                                </div>
                             ))}
                         </div>
                     </section>

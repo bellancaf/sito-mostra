@@ -10,6 +10,7 @@ import BooksListPage from './components/Books/BooksListPage';
 import BookPage from './components/Books/BookPage';
 import DiaryListPage from './components/Diary/DiaryListPage';
 import DiaryEntryPage from './components/Diary/DiaryEntryPage';
+import StatementPage from './components/Statement/StatementPage';
 
 import './App.css';
 import './styles/main.css'
@@ -38,6 +39,7 @@ const App: React.FC = () => {
                         <Route path="/books/:id" element={<BookPage />} />
                         <Route path="/diary" element={<DiaryListPage />} />
                         <Route path="/diary/:id" element={<DiaryEntryPage />} />
+                        <Route path="/statement" element={<StatementPage />} />
                     </Routes>
                 </main>
             </div>

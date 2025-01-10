@@ -1,0 +1,47 @@
+.statement-page {
+    padding: var(--spacing-8);
+    max-width: 700px;
+    margin: 0 auto;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.statement-page.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.statement-content {
+    font-family: var(--font-family-barcode);
+}
+
+.statement-content h1 {
+    font-size: var(--text-3xl);
+    color: var(--color-gray-600);
+    margin-bottom: var(--spacing-6);
+}
+
+.statement-main p,
+.archive-section p {
+    font-size: var(--text-base);
+    line-height: 1.6;
+    color: var(--color-gray-600);
+    margin-bottom: var(--spacing-4);
+}
+
+.archive-section {
+    margin-top: var(--spacing-8);
+}
+
+.archive-section h2 {
+    font-size: var(--text-xl);
+    color: var(--color-gray-600);
+    margin-bottom: var(--spacing-4);
+}
+
+@media (max-width: 768px) {
+    .statement-page {
+        padding: var(--spacing-4);
+    }
+} 

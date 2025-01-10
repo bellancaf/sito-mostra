@@ -40,7 +40,8 @@ const NavBar: React.FC<NavBarProps> = ({ isNavbarVisible }) => {
         return [
             { path: '/collages', label: 'collages' },
             { path: '/books', label: 'library' },
-            { path: '/diary', label: 'diary' }
+            { path: '/diary', label: 'diary' },
+            { path: '/statement', label: 'statement' }
         ].map((item) => (
             <li key={item.path}>
                 <Link 

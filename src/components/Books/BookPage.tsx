@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { getBook, getCollagesForBook, getRelatedDiaryEntries } from '../../data';
 import { Collage } from '../../types';
 import './BookPage.css';
+import Breadcrumbs from '../common/Breadcrumbs';
 
 const BookPage: React.FC = () => {
     const { id } = useParams();
@@ -23,6 +24,13 @@ const BookPage: React.FC = () => {
 
     return (
         <div className={`book-page ${isVisible ? 'visible' : ''}`}>
+            <Breadcrumbs 
+                items={[
+                    { label: 'books', path: '/books' },
+                    { label: book.title }
+                ]} 
+            />
+            
             <div className="book-main">
                 <div className="book-header">
                     <img 
@@ -35,6 +43,19 @@ const BookPage: React.FC = () => {
                         <h2>{book.author}</h2>
                         <span className="book-year">{book.publishYear}</span>
                         <p className="book-description">{book.description}</p>
+                        
+                        {book.location && (
+                            <div className="book-location">
+                                <h3>Found at</h3>
+                                <div className="location-details">
+                                    <span className="location-name">{book.location.name}</span>
+                                    <div className="location-meta">
+                                        <span className="location-city">{book.location.city}</span>
+                                        <span className="location-country">{book.location.country}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

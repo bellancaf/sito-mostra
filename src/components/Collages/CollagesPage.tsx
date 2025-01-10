@@ -56,7 +56,18 @@ const CollagesPage: React.FC = () => {
 
     useEffect(() => {
         if (!isGridView) {
-            createNetworkVisualization();
+            const updateNetworkSize = () => {
+                if (!networkRef.current) return;
+                
+                // Set the SVG to fill the container height
+                networkRef.current.style.height = 'calc(100vh - 200px)';
+                createNetworkVisualization();
+            };
+
+            updateNetworkSize();
+            window.addEventListener('resize', updateNetworkSize);
+            
+            return () => window.removeEventListener('resize', updateNetworkSize);
         }
     }, [isGridView]);
 
@@ -313,23 +324,27 @@ const CollagesPage: React.FC = () => {
     return (
         <div className="collages-container">
             <div className="collages-main-content">
-                <h1 className="collages-title">Collages</h1>
-                
-                <div className="view-toggle">
-                    <span className={`toggle-label ${!isGridView ? 'active' : ''}`}>
-                        Network View
-                    </span>
-                    <label className="toggle-switch">
-                        <input
-                            type="checkbox"
-                            checked={isGridView}
-                            onChange={() => setIsGridView(!isGridView)}
-                        />
-                        <span className="toggle-slider"></span>
-                    </label>
-                    <span className={`toggle-label ${isGridView ? 'active' : ''}`}>
-                        Grid View
-                    </span>
+                <div className="collages-header">
+                    <div className="title-section">
+                        <h1 className="collages-title">Collages</h1>
+                        <p className="collages-description">
+                            Here you can find my collages. You can see them in a{' '}
+                            <span 
+                                className={`view-option ${!isGridView ? 'active' : ''}`}
+                                onClick={() => setIsGridView(false)}
+                            >
+                                network
+                            </span>
+                            {' '}or{' '}
+                            <span 
+                                className={`view-option ${isGridView ? 'active' : ''}`}
+                                onClick={() => setIsGridView(true)}
+                            >
+                                grid
+                            </span>
+                            {' '}view.
+                        </p>
+                    </div>
                 </div>
 
                 {isGridView ? (

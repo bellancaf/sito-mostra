@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { getBook, getRelatedCollages, getRelatedDiaryEntries } from '../../data';
+import { getBook, getCollagesForBook, getRelatedDiaryEntries } from '../../data';
+import { Collage } from '../../types';
 import './BookPage.css';
 
 const BookPage: React.FC = () => {
-    const { id } = useParams<{ id: string }>();
+    const { id } = useParams();
+    const book = getBook(id || '');
     const [isVisible, setIsVisible] = useState(false);
-    const book = getBook(id || "");
     
     useEffect(() => {
         setIsVisible(true);
@@ -14,8 +15,11 @@ const BookPage: React.FC = () => {
 
     if (!book) return <div className="not-found">Book not found</div>;
     
-    const relatedCollages = getRelatedCollages(book.collageIds);
-    const diaryEntries = getRelatedDiaryEntries(book.collageIds);
+    // Get collages that reference this book
+    const relatedCollages = getCollagesForBook(book.id);
+
+    // Get diary entries that this book references
+    const diaryEntries = getRelatedDiaryEntries(book.diaryIds);
 
     return (
         <div className={`book-page ${isVisible ? 'visible' : ''}`}>

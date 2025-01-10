@@ -5,7 +5,7 @@ export interface Book {
     coverImage: string;
     description: string;
     author: string;
-    collageIds: string[];  // References to collages that use this book
+    diaryIds: string[];  // References to diary entries that mention this book
 }
 
 export interface Collage {
@@ -15,7 +15,6 @@ export interface Collage {
     description: string;
     date: string;
     bookIds: string[];  // References to books used in this collage
-    diaryEntryIds: string[];  // References to diary entries mentioning this collage
 }
 
 export interface DiaryEntry {
@@ -24,7 +23,6 @@ export interface DiaryEntry {
     title: string;
     content: string;
     bookIds: string[];  // References to books mentioned in this entry
-    collageIds: string[];  // References to collages mentioned in this entry
     location?: string;
     mood?: string;
 } 

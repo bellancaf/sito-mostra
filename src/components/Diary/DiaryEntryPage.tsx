@@ -1,22 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { getDiaryEntry, getRelatedBooks, getRelatedCollages } from '../../data';
+import { getDiaryEntry, getRelatedBooks, getCollagesForDiaryEntry } from '../../data';
+import { Collage } from '../../types';
 import './DiaryEntryPage.css';
 import ExpandableBookCard from '../Books/components/ExpandableBookCard';
 
 const DiaryEntryPage: React.FC = () => {
-    const { id } = useParams<{ id: string }>();
+    const { id } = useParams();
     const [isVisible, setIsVisible] = useState(false);
-    const entry = getDiaryEntry(id || "");
+    const entry = getDiaryEntry(id || '');
     
     useEffect(() => {
         setIsVisible(true);
     }, []);
 
-    if (!entry) return <div className="not-found">Entry not found</div>;
+    if (!entry) return <div className="not-found">Diary entry not found</div>;
     
     const relatedBooks = getRelatedBooks(entry.bookIds);
-    const relatedCollages = getRelatedCollages(entry.collageIds);
+    const relatedCollages = getCollagesForDiaryEntry(entry.id);
 
     return (
         <div className={`diary-entry-page ${isVisible ? 'visible' : ''}`}>

@@ -40,23 +40,25 @@ const BooksListPage: React.FC = () => {
         const height = networkRef.current.clientHeight || 600;
         const imageWidth = 80;
         const imageHeight = 120;
-
-        const svg = d3.select(networkRef.current)
-            .attr('width', width)
-            .attr('height', height);
-
-        // Clear any existing content
-        svg.selectAll("*").remove();
+        const margin = 100; // Add margin from edges
 
         // Add zoom behavior
         const zoomBehavior = d3.zoom<SVGSVGElement, unknown>()
-            .scaleExtent([0.1, 4]) // Min and max zoom scale
+            .scaleExtent([0.2, 3]) // Min and max zoom scale
             .on('zoom', (event) => {
                 container.attr('transform', event.transform);
             });
 
-        svg.call(zoomBehavior);
+        const svg = d3.select(networkRef.current)
+            .attr('width', width)
+            .attr('height', height)
+            .call(zoomBehavior)
+            .on("dblclick.zoom", null); // Disable double-click zoom
 
+        // Clear existing SVG content
+        svg.selectAll("*").remove();
+
+        // Create a container group for all elements
         const container = svg.append('g');
 
         // Create nodes from books
@@ -87,16 +89,6 @@ const BooksListPage: React.FC = () => {
             });
         });
 
-        const simulation = d3.forceSimulation<NodeDatum>(nodes)
-            .force('link', d3.forceLink<NodeDatum, LinkDatum>(links)
-                .id(d => d.id)
-                .distance(250))
-            .force('charge', d3.forceManyBody()
-                .strength(-800))
-            .force('collision', d3.forceCollide()
-                .radius(Math.max(imageWidth, imageHeight) / 1.5))
-            .force('center', d3.forceCenter(width / 2, height / 2));
-
         // Create patterns for book covers
         const defs = svg.append('defs');
         nodes.forEach(node => {
@@ -108,7 +100,7 @@ const BooksListPage: React.FC = () => {
                 .attr('href', node.coverImage)
                 .attr('width', imageWidth)
                 .attr('height', imageHeight)
-                .attr('preserveAspectRatio', 'xMidYMid meet'); // Changed from 'slice' to 'meet'
+                .attr('preserveAspectRatio', 'xMidYMid meet');
         });
 
         const link = container.append('g')
@@ -149,6 +141,87 @@ const BooksListPage: React.FC = () => {
             .style('opacity', 0)
             .style('font-size', '10px');
 
+        const simulation = d3.forceSimulation<NodeDatum>(nodes)
+            .force('link', d3.forceLink<NodeDatum, LinkDatum>(links)
+                .id(d => d.id)
+                .distance(250))
+            .force('charge', d3.forceManyBody()
+                .strength(-800))
+            .force('collision', d3.forceCollide()
+                .radius(Math.max(imageWidth, imageHeight) / 1.5))
+            .force('center', d3.forceCenter(width / 2, height / 2))
+            // Add boundary forces
+            .force('x', d3.forceX(width / 2).strength(0.1))
+            .force('y', d3.forceY(height / 2).strength(0.1))
+            .force('boundary', () => {
+                for (const node of nodes) {
+                    // Keep nodes within bounds
+                    node.x = Math.max(margin, Math.min(width - margin, node.x!));
+                    node.y = Math.max(margin, Math.min(height - margin, node.y!));
+                }
+            });
+
+        // Add zoom controls
+        const zoomControls = svg.append('g')
+            .attr('class', 'zoom-controls')
+            .attr('transform', `translate(20, ${height - 80})`);
+
+        zoomControls.append('rect')
+            .attr('width', 30)
+            .attr('height', 60)
+            .attr('rx', 5)
+            .attr('fill', 'white')
+            .attr('stroke', '#ccc');
+
+        // Zoom in button
+        zoomControls.append('g')
+            .attr('class', 'zoom-in')
+            .attr('transform', 'translate(0, 0)')
+            .on('click', () => {
+                svg.transition()
+                    .duration(300)
+                    .call(zoomBehavior.scaleBy as any, 1.3);
+            })
+            .append('text')
+            .attr('x', 15)
+            .attr('y', 20)
+            .attr('text-anchor', 'middle')
+            .text('+')
+            .style('font-size', '20px')
+            .style('cursor', 'pointer');
+
+        // Zoom out button
+        zoomControls.append('g')
+            .attr('class', 'zoom-out')
+            .attr('transform', 'translate(0, 30)')
+            .on('click', () => {
+                svg.transition()
+                    .duration(300)
+                    .call(zoomBehavior.scaleBy as any, 0.7);
+            })
+            .append('text')
+            .attr('x', 15)
+            .attr('y', 20)
+            .attr('text-anchor', 'middle')
+            .text('−')
+            .style('font-size', '20px')
+            .style('cursor', 'pointer');
+
+        // Reset zoom button
+        zoomControls.append('g')
+            .attr('class', 'zoom-reset')
+            .attr('transform', `translate(60, 0)`)
+            .on('click', () => {
+                svg.transition()
+                    .duration(300)
+                    .call(zoomBehavior.transform as any, d3.zoomIdentity);
+            })
+            .append('text')
+            .attr('text-anchor', 'middle')
+            .text('Reset')
+            .style('font-size', '12px')
+            .style('cursor', 'pointer');
+
         // Hover effects
         nodeGroup
             .on('mouseover', function() {
@@ -188,6 +261,12 @@ const BooksListPage: React.FC = () => {
         nodeGroup.call(dragBehavior as any);
 
         simulation.on('tick', () => {
+            // Keep nodes within bounds during simulation
+            nodes.forEach(node => {
+                node.x = Math.max(margin, Math.min(width - margin, node.x!));
+                node.y = Math.max(margin, Math.min(height - margin, node.y!));
+            });
+
             link
                 .attr('x1', d => d.source.x!)
                 .attr('y1', d => d.source.y!)
@@ -195,70 +274,78 @@ const BooksListPage: React.FC = () => {
                 .attr('y2', d => d.target.y!);
 
             nodeGroup
-                .attr('transform', d => `translate(${d.x! - imageWidth/2},${d.y! - imageHeight/2})`);
-
-            titleText
-                .attr('x', imageWidth / 2);
+                .attr('transform', d => 
+                    `translate(${d.x! - imageWidth/2},${d.y! - imageHeight/2})`
+                );
         });
     };
 
     return (
         <div className="books-container">
-            <h1 className="books-title">Books</h1>
-            
-            <div className="view-controls">
-                <button 
-                    className={`view-button ${viewMode === 'grid' ? 'active' : ''}`}
-                    onClick={() => setViewMode('grid')}
-                >
-                    grid
-                </button>
-                <button 
-                    className={`view-button ${viewMode === 'network' ? 'active' : ''}`}
-                    onClick={() => setViewMode('network')}
-                >
-                    network
-                </button>
-                <button 
-                    className={`view-button ${viewMode === 'timeline' ? 'active' : ''}`}
-                    onClick={() => setViewMode('timeline')}
-                >
-                    timeline
-                </button>
-            </div>
-
-            {viewMode === 'grid' && (
-                <div className="books-grid">
-                    {books.map(book => (
-                        <Link 
-                            to={`/books/${book.id}`} 
-                            key={book.id}
-                            className="book-card"
-                        >
-                            <div className="book-cover-container">
-                                <img 
-                                    src={book.coverImage} 
-                                    alt={book.title} 
-                                    className="book-cover"
-                                />
-                            </div>
-                            <div className="book-info">
-                                <h2>{book.title}</h2>
-                                <span className="book-author">{book.author}</span>
-                                <span className="book-year">{book.publishYear}</span>
-                            </div>
-                        </Link>
-                    ))}
+            <div className="books-main-content">
+                <div className="books-header">
+                    <div className="title-section">
+                        <h1 className="books-title">Books</h1>
+                        <p className="books-description">
+                            Here you can find my books. You can see them in a{' '}
+                            <span 
+                                className={`view-option ${viewMode === 'grid' ? 'active' : ''}`}
+                                onClick={() => setViewMode('grid')}
+                            >
+                                grid
+                            </span>
+                            {', '}
+                            <span 
+                                className={`view-option ${viewMode === 'network' ? 'active' : ''}`}
+                                onClick={() => setViewMode('network')}
+                            >
+                                network
+                            </span>
+                            {' '}or{' '}
+                            <span 
+                                className={`view-option ${viewMode === 'timeline' ? 'active' : ''}`}
+                                onClick={() => setViewMode('timeline')}
+                            >
+                                timeline
+                            </span>
+                            {' '}view.
+                        </p>
+                    </div>
                 </div>
-            )}
-            
-            {viewMode === 'network' && (
-                <svg ref={networkRef} className="books-network"></svg>
-            )}
-            
-            {viewMode === 'timeline' && (
-                <BooksTimeline books={books} />
-            )}
+
+                {viewMode === 'grid' && (
+                    <div className="books-grid">
+                        {books.map(book => (
+                            <Link 
+                                to={`/books/${book.id}`} 
+                                key={book.id}
+                                className="book-card"
+                            >
+                                <div className="book-cover-container">
+                                    <img 
+                                        src={book.coverImage} 
+                                        alt={book.title} 
+                                        className="book-cover"
+                                    />
+                                </div>
+                                <div className="book-info">
+                                    <h2>{book.title}</h2>
+                                    <span className="book-author">{book.author}</span>
+                                    <span className="book-year">{book.publishYear}</span>
+                                </div>
+                            </Link>
+                        ))}
+                    </div>
+                )}
+                
+                {viewMode === 'network' && (
+                    <svg ref={networkRef} className="books-network"></svg>
+                )}
+                
+                {viewMode === 'timeline' && (
+                    <BooksTimeline books={books} />
+                )}
+            </div>
         </div>
     );
 };

@@ -191,9 +191,10 @@ const Homepage: React.FC<HomepageProps> = ({ setIsNavbarVisible, isNavbarVisible
             .data(links)
             .join('line')
             .attr('stroke', '#999')
-            .attr('stroke-opacity', 0.6);
+            .attr('stroke-opacity', 0.6)
+            .attr('class', 'network-link');
 
-        // Create nodes with drag and click behavior
+        // Create nodes
         const node = container.append('g')
             .selectAll('rect')
             .data(nodes)
@@ -207,6 +208,7 @@ const Homepage: React.FC<HomepageProps> = ({ setIsNavbarVisible, isNavbarVisible
                     case 'diary': return '#ffff00';
                 }
             })
+            .attr('class', 'network-node')
             .style('cursor', 'pointer')
             .call(d3.drag<SVGRectElement, NodeDatum>()
                 .on('start', (event, d) => {
@@ -246,30 +248,66 @@ const Homepage: React.FC<HomepageProps> = ({ setIsNavbarVisible, isNavbarVisible
                 }
             })
             .on('mouseover', (event, d) => {
-                let title = '';
+                let tooltipContent = '';
+                let nodeType = '';
+                
                 switch (d.type) {
                     case 'book':
-                        title = books.find(b => b.id === d.id)?.title || 'Unknown Book';
+                        const book = books.find(b => b.id === d.id);
+                        if (book) {
+                            tooltipContent = `${book.title} (${book.publishYear})`;
+                            nodeType = 'book-tooltip';
+                        }
                         break;
                     case 'collage':
-                        title = collages.find(c => c.id === d.id)?.title || 'Unknown Collage';
+                        const collage = collages.find(c => c.id === d.id);
+                        if (collage) {
+                            tooltipContent = collage.title;
+                            nodeType = 'collage-tooltip';
+                        }
                         break;
                     case 'diary':
-                        title = diaryEntries.find(de => de.id === d.id)?.title || 'Unknown Entry';
+                        const diary = diaryEntries.find(de => de.id === d.id);
+                        if (diary) {
+                            tooltipContent = `${diary.title} - ${diary.date}`;
+                            nodeType = 'diary-tooltip';
+                        }
                         break;
                 }
                 
                 tooltip.transition()
                     .duration(200)
                     .style('opacity', .9);
-                tooltip.html(`${title} (${d.type})<br/>Click to view details`)
+                
+                tooltip
+                    .attr('class', `network-tooltip ${nodeType}`)
+                    .html(tooltipContent)
                     .style('left', (event.pageX + 10) + 'px')
                     .style('top', (event.pageY - 10) + 'px');
+
+                // Gray out unrelated nodes and links
+                node.style('opacity', n => {
+                    // Check if this is the hovered node or connected to it
+                    if (n === d) return 1;
+                    const isConnected = links.some(link => 
+                        (link.source === d && link.target === n) ||
+                        (link.target === d && link.source === n)
+                    );
+                    return isConnected ? 1 : 0.2;
+                });
+
+                link.style('opacity', l => 
+                    (l.source === d || l.target === d) ? 1 : 0.1
+                );
             })
             .on('mouseout', () => {
                 tooltip.transition()
                     .duration(500)
                     .style('opacity', 0);
+
+                // Reset all nodes and links opacity
+                node.style('opacity', 1);
+                link.style('opacity', 1);
             });
 
         // Force simulation with adjusted forces

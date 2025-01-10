@@ -40,26 +40,29 @@
 .network-tooltip {
 	position: absolute;
 	padding: 8px 12px;
-	background: rgba(0, 0, 0, 0.8);
-	color: white;
+	background: var(--color-background);
+	color: var(--color-gray-600);
 	font-size: 12px;
 	pointer-events: none;
 	z-index: 1000;
-	max-width: 200px;
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
+	border-width: 2px;
+	border-style: solid;
+}
+
+.network-tooltip.book-tooltip {
+	border-color: #0000ff;
+}
+
+.network-tooltip.collage-tooltip {
+	border-color: #ff0000;
+}
+
+.network-tooltip.diary-tooltip {
+	border-color: #ffff00;
 }
 
 .network-tooltip::after {
-	content: '';
-	position: absolute;
-	top: 100%;
-	left: 50%;
-	margin-left: -5px;
-	border-width: 5px;
-	border-style: solid;
-	border-color: rgba(0, 0, 0, 0.8) transparent transparent transparent;
+	display: none;
 }
 
 .network-filters {
@@ -147,4 +150,12 @@
 	margin-left: 4px;
 	line-height: inherit;
 	display: inline-block;
+}
+
+.network-node {
+	transition: opacity 0.3s ease;
+}
+
+.network-link {
+	transition: opacity 0.3s ease;
 }

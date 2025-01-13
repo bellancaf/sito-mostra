@@ -158,13 +158,29 @@
 .book-year {
     font-family: monospace;
     font-size: 0.875rem;
-    color: var(--color-gray-500);
 }
 
 .book-card-content {
-    margin-top: 1rem;
-    padding-top: 1rem;
-    border-top: 1px solid var(--color-gray-200);
+    padding-top: var(--spacing-2);
+}
+
+.book-card-content .book-author {
+    font-size: var(--text-sm);
+    margin: var(--spacing-1) 0;
+    color: var(--color-gray-600);
+}
+
+.book-card-content .book-description {
+    font-size: var(--text-xs);
+    line-height: 1.4;
+    margin: var(--spacing-2) 0;
+    color: var(--color-text);
+}
+
+.book-card-content .read-more-link {
+    font-size: var(--text-xs);
+    display: inline-block;
+    margin-top: var(--spacing-1);
 }
 
 .book-cover {
@@ -204,6 +220,7 @@
     display: flex;
     justify-content: center;
     align-items: flex-start;
+    position: relative;
 }
 
 .collage-image {
@@ -213,6 +230,33 @@
     height: auto;
     display: block;
     object-fit: contain;
+}
+
+.fullscreen-toggle {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: rgba(0, 0, 0, 0.5);
+    border: none;
+    border-radius: 50%;
+    width: 2.5rem;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: white;
+    z-index: 2;
+    transition: background-color 0.3s ease;
+}
+
+.fullscreen-toggle:hover {
+    background: rgba(0, 0, 0, 0.7);
+}
+
+.fullscreen-toggle svg {
+    width: 1rem;
+    height: 1rem;
 }
 
 /* Responsive adjustments */

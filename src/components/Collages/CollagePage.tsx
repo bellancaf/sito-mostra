@@ -1,13 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { getCollage, getRelatedBooks } from '../../data';
 import { Book } from '../../types';
 import './CollagePage.css';
 import Breadcrumbs from '../common/Breadcrumbs';
+import { FaExpand } from 'react-icons/fa';
+import Lightbox from 'yet-another-react-lightbox';
+import Zoom from 'yet-another-react-lightbox/plugins/zoom';
+import 'yet-another-react-lightbox/styles.css';
 
 const CollagePage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const [expandedBookId, setExpandedBookId] = useState<string | null>(null);
+    const [isLightboxOpen, setIsLightboxOpen] = useState(false);
     const collage = getCollage(id || '');
     const relatedBooks = getRelatedBooks(collage?.bookIds || []);
 
@@ -54,8 +59,7 @@ const CollagePage: React.FC = () => {
                                     onClick={() => toggleBook(book.id)}
                                 >
                                     <div className="book-card-header">
-                                        <h3>{book.title}</h3>
-                                        <span className="book-year">{book.publishYear}</span>
+                                        <h3>{book.title} ({book.publishYear})</h3>
                                     </div>
                                     
                                     {expandedBookId === book.id && (
@@ -79,10 +83,33 @@ const CollagePage: React.FC = () => {
 
                 <main className="collage-main">
                     <div className="collage-image-container">
+                        <button 
+                            className="fullscreen-toggle"
+                            onClick={() => setIsLightboxOpen(true)}
+                            aria-label="Open fullscreen"
+                        >
+                            <FaExpand />
+                        </button>
                         <img 
                             src={collage.image} 
                             alt={collage.title} 
                             className="collage-image"
+                        />
+                        
+                        <Lightbox
+                            open={isLightboxOpen}
+                            close={() => setIsLightboxOpen(false)}
+                            slides={[{ src: collage.image }]}
+                            plugins={[Zoom]}
+                            render={{
+                                buttonPrev: () => null,
+                                buttonNext: () => null
+                            }}
+                            zoom={{
+                                wheelZoomDistanceFactor: 100,
+                                pinchZoomDistanceFactor: 100,
+                                scrollToZoom: true
+                            }}
                         />
                     </div>
                 </main>

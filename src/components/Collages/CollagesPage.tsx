@@ -4,6 +4,7 @@ import { collages } from '../../data';
 import * as d3 from 'd3';
 import './CollagesPage.css';
 import CollagesSidebar from './components/CollagesSidebar';
+import { FaThLarge, FaProjectDiagram } from 'react-icons/fa';
 
 interface NodeDatum {
     id: string;
@@ -333,14 +334,16 @@ const CollagesPage: React.FC = () => {
                                 className={`view-option ${!isGridView ? 'active' : ''}`}
                                 onClick={() => setIsGridView(false)}
                             >
-                                network
+                                <FaProjectDiagram className="view-icon" />
+                                <span className="view-label">network</span>
                             </span>
                             {' '}or{' '}
                             <span 
                                 className={`view-option ${isGridView ? 'active' : ''}`}
                                 onClick={() => setIsGridView(true)}
                             >
-                                grid
+                                <FaThLarge className="view-icon" />
+                                <span className="view-label">grid</span>
                             </span>
                             {' '}view.
                         </p>

@@ -105,7 +105,6 @@
 .book-year,
 .collage-date {
     font-family: monospace;
-    color: var(--color-accent);
     font-size: var(--text-sm);
 }
 

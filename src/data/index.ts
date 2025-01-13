@@ -202,7 +202,7 @@ export const collages: Collage[] = [
         id: "2",
         title: "Touch Grass",
         image: "/images/collages/touch_grass.jpg",
-        description: "Exploring the subterranean realms of consciousness",
+        description: "Algeria, De Gaulle and french folk traditions. Opulence and exploitation. Golf courses and the aftermath of colonisation. They look so obvious when put next to each other and yet are annoyingly and programmatically hidden.   ",
         date: "2024-03-20",
         bookIds: ["3", "4"]
     },
@@ -216,9 +216,9 @@ export const collages: Collage[] = [
     },
     {
         id: "4",
-        title: "Bureaucratic Nightmares",
+        title: "2781",
         image: "/images/collages/2781.jpg",
-        description: "The crushing weight of administrative systems",
+        description: "Sweater as a base. Paul Wunderlich’s surrealist sex, a regular tuesday wank in braille shadowing Stalin’s mentions. I had fun with this, a ping pong for the eye, a mention a CEO getting shot, the re-emergence of armed class consciousness? 2871 are the billionaires alive. Not that many.",
         date: "2024-03-30",
         bookIds: []
     },

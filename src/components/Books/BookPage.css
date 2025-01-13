@@ -34,23 +34,9 @@
     padding: 1rem 0;
 }
 
-.book-info h1 {
-    font-family: var(--font-family-barcode);
-    font-size: var(--text-4xl);
-    color: var(--color-gray-600);
-    margin: 0;
-}
-
 .book-info h2 {
     font-size: var(--text-2xl);
-    color: var(--color-gray-500);
     margin: 0;
-}
-
-.book-year {
-    font-family: monospace;
-    color: var(--color-accent);
-    font-size: var(--text-lg);
 }
 
 .book-description {
@@ -199,4 +185,15 @@
     content: '•';
     margin-left: var(--spacing-2);
     color: var(--color-gray-400);
+}
+
+.book-info .book-title-with-year {
+    font-family: var(--font-family-barcode);
+    font-size: var(--text-4xl);
+    margin: 0;
+    color: var(--color-text);
+}
+
+.book-info .book-title-with-year span {
+    color: var(--color-gray-500);
 } 

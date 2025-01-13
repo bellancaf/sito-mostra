@@ -4,6 +4,7 @@ import { books, getCollagesForBook } from '../../data';
 import * as d3 from 'd3';
 import './BooksListPage.css';
 import BooksTimeline from './components/BooksTimeline';
+import { FaThLarge, FaProjectDiagram, FaStream } from 'react-icons/fa';
 
 interface NodeDatum {
     id: string;
@@ -292,21 +293,24 @@ const BooksListPage: React.FC = () => {
                                 className={`view-option ${viewMode === 'grid' ? 'active' : ''}`}
                                 onClick={() => setViewMode('grid')}
                             >
-                                grid
+                                <FaThLarge className="view-icon" />
+                                <span className="view-label">grid</span>
                             </span>
                             {', '}
                             <span 
                                 className={`view-option ${viewMode === 'network' ? 'active' : ''}`}
                                 onClick={() => setViewMode('network')}
                             >
-                                network
+                                <FaProjectDiagram className="view-icon" />
+                                <span className="view-label">network</span>
                             </span>
                             {' '}or{' '}
                             <span 
                                 className={`view-option ${viewMode === 'timeline' ? 'active' : ''}`}
                                 onClick={() => setViewMode('timeline')}
                             >
-                                timeline
+                                <FaStream className="view-icon" />
+                                <span className="view-label">timeline</span>
                             </span>
                             {' '}view.
                         </p>
@@ -327,11 +331,28 @@ const BooksListPage: React.FC = () => {
                                         alt={book.title} 
                                         className="book-cover"
                                     />
+                                    <div className="book-overlay">
+                                        <div className="book-overlay-content">
+                                            <p className="book-description-preview">
+                                                {book.description.substring(0, 150)}...
+                                            </p>
+                                            <span className="view-details">View Details →</span>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div className="book-info">
-                                    <h2>{book.title}</h2>
-                                    <span className="book-author">{book.author}</span>
-                                    <span className="book-year">{book.publishYear}</span>
+                                    <div className="book-main-info">
+                                        <h2>{book.title}</h2>
+                                        <span className="book-year">{book.publishYear}</span>
+                                    </div>
+                                    <div className="book-meta">
+                                        <span className="book-author">{book.author}</span>
+                                        {book.location && (
+                                            <span className="book-location-tag">
+                                                {book.location.city}
+                                            </span>
+                                        )}
+                                    </div>
                                 </div>
                             </Link>
                         ))}

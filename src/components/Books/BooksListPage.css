@@ -97,7 +97,7 @@
     display: flex;
     flex-direction: column;
     position: relative;
-    border-radius: 8px;
+    border-radius: 0;
 }
 
 .book-card:hover {
@@ -109,9 +109,10 @@
 .book-cover-container {
     position: relative;
     width: 100%;
-    padding-top: 140%; /* Aspect ratio for cover */
+    padding-top: 140%;
     overflow: hidden;
     background: var(--color-gray-100);
+    border-radius: 0;
 }
 
 .book-cover {
@@ -121,7 +122,16 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.5s ease;
+}
+
+/* Add this to ensure the canvas covers the container properly */
+.book-cover-container canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .book-overlay {
@@ -224,4 +234,12 @@
         grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
         gap: var(--spacing-4);
     }
+} 
+
+.books-network {
+    width: 100%;
+    height: 600px; /* Reduced height */
+    border: 2px solid var(--color-gray-200);
+    margin-top: var(--spacing-4);
+    overflow: visible; /* Allow nodes to overflow */
 } 

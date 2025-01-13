@@ -5,6 +5,7 @@ import * as d3 from 'd3';
 import './BooksListPage.css';
 import BooksTimeline from './components/BooksTimeline';
 import { FaThLarge, FaProjectDiagram, FaStream } from 'react-icons/fa';
+import StaticNoiseBookCard from './components/StaticNoiseBookCard';
 
 interface NodeDatum {
     id: string;
@@ -15,11 +16,13 @@ interface NodeDatum {
     y?: number;
     fx?: number | null;
     fy?: number | null;
+    animationFrame?: number;
 }
 
 interface LinkDatum {
     source: NodeDatum;
     target: NodeDatum;
+    strength?: number;
 }
 
 type ViewMode = 'grid' | 'network' | 'timeline';
@@ -27,6 +30,9 @@ type ViewMode = 'grid' | 'network' | 'timeline';
 const BooksListPage: React.FC = () => {
     const [viewMode, setViewMode] = useState<ViewMode>('grid');
     const networkRef = useRef<SVGSVGElement | null>(null);
+    const canvasRefs = useRef<{ [key: string]: HTMLCanvasElement | null }>({});
+    const animationFrames = useRef<{ [key: string]: number }>({});
+    const isHovering = useRef<{ [key: string]: boolean }>({});
 
     useEffect(() => {
         if (viewMode === 'network') {
@@ -37,15 +43,13 @@ const BooksListPage: React.FC = () => {
     const createNetworkVisualization = () => {
         if (!networkRef.current) return;
 
-        const width = networkRef.current.clientWidth || 800;
-        const height = networkRef.current.clientHeight || 600;
-        const imageWidth = 80;
-        const imageHeight = 120;
-        const margin = 100; // Add margin from edges
+        const width = networkRef.current.clientWidth || 1200;
+        const height = 600;
+        const nodeSize = 120;
 
         // Add zoom behavior
-        const zoomBehavior = d3.zoom<SVGSVGElement, unknown>()
-            .scaleExtent([0.2, 3]) // Min and max zoom scale
+        const zoom = d3.zoom<SVGSVGElement, unknown>()
+            .scaleExtent([0.2, 3])
             .on('zoom', (event) => {
                 container.attr('transform', event.transform);
             });
@@ -53,15 +57,22 @@ const BooksListPage: React.FC = () => {
         const svg = d3.select(networkRef.current)
             .attr('width', width)
             .attr('height', height)
-            .call(zoomBehavior)
-            .on("dblclick.zoom", null); // Disable double-click zoom
+            .call(zoom)
+            .on("dblclick.zoom", null);
 
-        // Clear existing SVG content
         svg.selectAll("*").remove();
 
         // Create a container group for all elements
-        const container = svg.append('g');
+        const container = svg.append('g')
+            .attr('transform', `translate(${width/2},${height/2})`);
 
+        // First create a group for links (to ensure they're behind nodes)
+        const linksGroup = container.append('g').attr('class', 'links');
+        const nodesGroup = container.append('g').attr('class', 'nodes');
+
+        // Create patterns for book covers with static noise
+        const defs = svg.append('defs');
+        
         // Create nodes from books
         const nodes: NodeDatum[] = books.map(book => ({
             id: book.id,
@@ -74,7 +85,7 @@ const BooksListPage: React.FC = () => {
         const links: LinkDatum[] = [];
         books.forEach((book1, i) => {
             books.forEach((book2, j) => {
-                if (i < j) {  // Avoid duplicate links
+                if (i < j) {
                     const collagesForBook1 = getCollagesForBook(book1.id);
                     const collagesForBook2 = getCollagesForBook(book2.id);
                     const sharedCollages = collagesForBook1.filter(collage => 
@@ -83,202 +94,313 @@ const BooksListPage: React.FC = () => {
                     if (sharedCollages.length > 0) {
                         links.push({ 
                             source: nodes[i], 
-                            target: nodes[j]
+                            target: nodes[j],
+                            strength: sharedCollages.length // Add strength based on number of shared collages
                         });
                     }
                 }
             });
         });
 
-        // Create patterns for book covers
-        const defs = svg.append('defs');
+        // Create static noise patterns for each book
         nodes.forEach(node => {
-            defs.append('pattern')
-                .attr('id', `image-${node.id}`)
+            const pattern = defs.append('pattern')
+                .attr('id', `cover-${node.id}`)
                 .attr('width', 1)
-                .attr('height', 1)
-                .append('image')
-                .attr('href', node.coverImage)
-                .attr('width', imageWidth)
-                .attr('height', imageHeight)
-                .attr('preserveAspectRatio', 'xMidYMid meet');
+                .attr('height', 1);
+
+            const canvas = document.createElement('canvas');
+            canvas.width = nodeSize;
+            canvas.height = nodeSize;
+            const ctx = canvas.getContext('2d');
+            if (!ctx) return;
+
+            const img = new Image();
+            img.onload = () => {
+                // Draw image
+                ctx.drawImage(img, 0, 0, nodeSize, nodeSize);
+                
+                // Add static noise
+                const imageData = ctx.getImageData(0, 0, nodeSize, nodeSize);
+                const data = imageData.data;
+
+                // Add semi-transparent noise
+                for (let i = 0; i < data.length; i += 4) {
+                    const value = Math.random() * 255;
+                    data[i + 3] = value * 0.3;
+                }
+
+                // Add colored dots
+                const primaryColors = [[255, 0, 0], [255, 255, 0], [0, 0, 255]];
+                const numDots = 15;
+                for (let i = 0; i < numDots; i++) {
+                    const x = Math.floor(Math.random() * nodeSize);
+                    const y = Math.floor(Math.random() * nodeSize);
+                    const color = primaryColors[Math.floor(Math.random() * primaryColors.length)];
+                    const pixelIndex = (y * nodeSize + x) * 4;
+                    
+                    for (let dy = 0; dy < 2; dy++) {
+                        for (let dx = 0; dx < 2; dx++) {
+                            const index = pixelIndex + (dy * nodeSize + dx) * 4;
+                            if (index < data.length - 3) {
+                                data[index] = color[0];
+                                data[index + 1] = color[1];
+                                data[index + 2] = color[2];
+                                data[index + 3] = 255;
+                            }
+                        }
+                    }
+                }
+
+                ctx.putImageData(imageData, 0, 0);
+                
+                // Update pattern
+                pattern.append('image')
+                    .attr('href', canvas.toDataURL())
+                    .attr('width', nodeSize)
+                    .attr('height', nodeSize)
+                    .attr('preserveAspectRatio', 'xMidYMid slice');
+            };
+            img.src = node.coverImage;
         });
 
-        const link = container.append('g')
-            .selectAll('line')
+        // Create the force simulation
+        const simulation = d3.forceSimulation<NodeDatum>(nodes)
+            .force('link', d3.forceLink<NodeDatum, LinkDatum>(links)
+                .id(d => d.id)
+                .distance(200) // Increased distance
+                .strength(d => (d.strength || 1) * 0.5)) // Use link strength
+            .force('charge', d3.forceManyBody()
+                .strength(-1000)) // Stronger repulsion
+            .force('collide', d3.forceCollide()
+                .radius(nodeSize * 0.8)
+                .strength(0.8))
+            .force('x', d3.forceX().strength(0.1))
+            .force('y', d3.forceY().strength(0.1));
+
+        // Draw links FIRST (so they're behind)
+        const link = linksGroup.selectAll('line')
             .data(links)
             .join('line')
             .attr('stroke', '#999')
             .attr('stroke-opacity', 0.6)
-            .attr('stroke-width', 1.5);
+            .attr('stroke-width', d => Math.sqrt((d.strength || 1) * 2));
 
-        const nodeGroup = container.append('g')
-            .selectAll('g')
+        // Draw nodes SECOND (so they're on top)
+        const node = nodesGroup.selectAll('g')
             .data(nodes)
-            .join('g');
+            .join('g')
+            .call(d3.drag<SVGGElement, NodeDatum>()
+                .on('start', dragstarted)
+                .on('drag', dragged)
+                .on('end', dragended) as any);
 
-        // Add rectangles with book covers
-        nodeGroup
-            .append('rect')
-            .attr('width', imageWidth)
-            .attr('height', imageHeight)
-            .attr('fill', d => `url(#image-${d.id})`);
+        // Add rectangles with book covers (no rounded corners)
+        node.append('rect')
+            .attr('width', nodeSize)
+            .attr('height', nodeSize)
+            .attr('x', -nodeSize/2)
+            .attr('y', -nodeSize/2)
+            .attr('fill', d => `url(#cover-${d.id})`);
 
-        // Add title background
-        nodeGroup
-            .append('rect')
-            .attr('width', imageWidth)
-            .attr('height', 40)
-            .attr('fill', 'rgba(0, 0, 0, 0.7)')
-            .style('opacity', 0);
+        // Add hover interaction for static noise effect
+        node.on('mouseenter', function(event, d) {
+            const pattern = defs.select(`#cover-${d.id}`);
+            const canvas = document.createElement('canvas');
+            canvas.width = nodeSize;
+            canvas.height = nodeSize;
+            const ctx = canvas.getContext('2d');
+            if (!ctx) return;
 
-        // Add title text
-        const titleText = nodeGroup
-            .append('text')
-            .attr('text-anchor', 'middle')
-            .attr('fill', '#ffffff')
-            .attr('dy', 20)
-            .text(d => d.title)
-            .style('opacity', 0)
-            .style('font-size', '10px');
+            const img = new Image();
+            img.onload = () => {
+                function animate() {
+                    if (!ctx) return;
+                    
+                    // Draw image
+                    ctx.drawImage(img, 0, 0, nodeSize, nodeSize);
+                    
+                    // Add noise effect
+                    const imageData = ctx.getImageData(0, 0, nodeSize, nodeSize);
+                    const data = imageData.data;
 
-        const simulation = d3.forceSimulation<NodeDatum>(nodes)
-            .force('link', d3.forceLink<NodeDatum, LinkDatum>(links)
-                .id(d => d.id)
-                .distance(250))
-            .force('charge', d3.forceManyBody()
-                .strength(-800))
-            .force('collision', d3.forceCollide()
-                .radius(Math.max(imageWidth, imageHeight) / 1.5))
-            .force('center', d3.forceCenter(width / 2, height / 2))
-            // Add boundary forces
-            .force('x', d3.forceX(width / 2).strength(0.1))
-            .force('y', d3.forceY(height / 2).strength(0.1))
-            .force('boundary', () => {
-                for (const node of nodes) {
-                    // Keep nodes within bounds
-                    node.x = Math.max(margin, Math.min(width - margin, node.x!));
-                    node.y = Math.max(margin, Math.min(height - margin, node.y!));
+                    // Add semi-transparent noise
+                    for (let i = 0; i < data.length; i += 4) {
+                        const value = Math.random() * 255;
+                        data[i + 3] = value * 0.3;
+                    }
+
+                    // Add colored dots
+                    const primaryColors = [[255, 0, 0], [255, 255, 0], [0, 0, 255]];
+                    const numDots = 15;
+                    for (let i = 0; i < numDots; i++) {
+                        const x = Math.floor(Math.random() * nodeSize);
+                        const y = Math.floor(Math.random() * nodeSize);
+                        const color = primaryColors[Math.floor(Math.random() * primaryColors.length)];
+                        const pixelIndex = (y * nodeSize + x) * 4;
+                        
+                        for (let dy = 0; dy < 2; dy++) {
+                            for (let dx = 0; dx < 2; dx++) {
+                                const index = pixelIndex + (dy * nodeSize + dx) * 4;
+                                if (index < data.length - 3) {
+                                    data[index] = color[0];
+                                    data[index + 1] = color[1];
+                                    data[index + 2] = color[2];
+                                    data[index + 3] = 255;
+                                }
+                            }
+                        }
+                    }
+
+                    ctx.putImageData(imageData, 0, 0);
+                    
+                    // Update pattern
+                    pattern.select('image')
+                        .attr('href', canvas.toDataURL());
+
+                    d.animationFrame = requestAnimationFrame(animate);
                 }
-            });
+                animate();
+            };
+            img.src = d.coverImage;
+        })
+        .on('mouseleave', function(event, d) {
+            if (d.animationFrame) {
+                cancelAnimationFrame(d.animationFrame);
+                delete d.animationFrame;
+            }
+            
+            // Reset to original image
+            const pattern = defs.select(`#cover-${d.id}`);
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                canvas.width = nodeSize;
+                canvas.height = nodeSize;
+                const ctx = canvas.getContext('2d');
+                if (!ctx) return;
+                ctx.drawImage(img, 0, 0, nodeSize, nodeSize);
+                pattern.select('image')
+                    .attr('href', canvas.toDataURL());
+            };
+            img.src = d.coverImage;
+        });
 
-        // Add zoom controls
-        const zoomControls = svg.append('g')
-            .attr('class', 'zoom-controls')
-            .attr('transform', `translate(20, ${height - 80})`);
+        function dragstarted(event: any) {
+            if (!event.active) simulation.alphaTarget(0.3).restart();
+            event.subject.fx = event.subject.x;
+            event.subject.fy = event.subject.y;
+        }
 
-        zoomControls.append('rect')
-            .attr('width', 30)
-            .attr('height', 60)
-            .attr('rx', 5)
-            .attr('fill', 'white')
-            .attr('stroke', '#ccc');
+        function dragged(event: any) {
+            event.subject.fx = event.x;
+            event.subject.fy = event.y;
+        }
 
-        // Zoom in button
-        zoomControls.append('g')
-            .attr('class', 'zoom-in')
-            .attr('transform', 'translate(0, 0)')
-            .on('click', () => {
-                svg.transition()
-                    .duration(300)
-                    .call(zoomBehavior.scaleBy as any, 1.3);
-            })
-            .append('text')
-            .attr('x', 15)
-            .attr('y', 20)
-            .attr('text-anchor', 'middle')
-            .text('+')
-            .style('font-size', '20px')
-            .style('cursor', 'pointer');
+        function dragended(event: any) {
+            if (!event.active) simulation.alphaTarget(0);
+            event.subject.fx = null;
+            event.subject.fy = null;
+        }
 
-        // Zoom out button
-        zoomControls.append('g')
-            .attr('class', 'zoom-out')
-            .attr('transform', 'translate(0, 30)')
-            .on('click', () => {
-                svg.transition()
-                    .duration(300)
-                    .call(zoomBehavior.scaleBy as any, 0.7);
-            })
-            .append('text')
-            .attr('x', 15)
-            .attr('y', 20)
-            .attr('text-anchor', 'middle')
-            .text('−')
-            .style('font-size', '20px')
-            .style('cursor', 'pointer');
-
-        // Reset zoom button
-        zoomControls.append('g')
-            .attr('class', 'zoom-reset')
-            .attr('transform', `translate(60, 0)`)
-            .on('click', () => {
-                svg.transition()
-                    .duration(300)
-                    .call(zoomBehavior.transform as any, d3.zoomIdentity);
-            })
-            .append('text')
-            .attr('text-anchor', 'middle')
-            .text('Reset')
-            .style('font-size', '12px')
-            .style('cursor', 'pointer');
-
-        // Hover effects
-        nodeGroup
-            .on('mouseover', function() {
-                const group = d3.select(this);
-                group.select('text').style('opacity', 1);
-                group.select('rect:nth-child(2)').style('opacity', 1);
-            })
-            .on('mouseout', function() {
-                const group = d3.select(this);
-                group.select('text').style('opacity', 0);
-                group.select('rect:nth-child(2)').style('opacity', 0);
-            })
-            .on('click', (event, d) => {
-                window.location.href = `/books/${d.id}`;
-            });
-
-        // Drag behavior
-        const dragBehavior = d3.drag<SVGGElement, NodeDatum>()
-            .on('start', (event: any) => {
-                if (!event.active) simulation.alphaTarget(0.3).restart();
-                const d = event.subject;
-                d.fx = d.x;
-                d.fy = d.y;
-            })
-            .on('drag', (event: any) => {
-                const d = event.subject;
-                d.fx = event.x;
-                d.fy = event.y;
-            })
-            .on('end', (event: any) => {
-                if (!event.active) simulation.alphaTarget(0);
-                const d = event.subject;
-                d.fx = null;
-                d.fy = null;
-            });
-
-        nodeGroup.call(dragBehavior as any);
-
+        // Update positions on each tick
         simulation.on('tick', () => {
-            // Keep nodes within bounds during simulation
-            nodes.forEach(node => {
-                node.x = Math.max(margin, Math.min(width - margin, node.x!));
-                node.y = Math.max(margin, Math.min(height - margin, node.y!));
-            });
-
             link
                 .attr('x1', d => d.source.x!)
                 .attr('y1', d => d.source.y!)
                 .attr('x2', d => d.target.x!)
                 .attr('y2', d => d.target.y!);
 
-            nodeGroup
-                .attr('transform', d => 
-                    `translate(${d.x! - imageWidth/2},${d.y! - imageHeight/2})`
-                );
+            node.attr('transform', d => `translate(${d.x},${d.y})`);
         });
+    };
+
+    const drawNoiseOverlay = (
+        ctx: CanvasRenderingContext2D, 
+        img: HTMLImageElement,
+        width: number,
+        height: number
+    ) => {
+        // Draw the image first
+        ctx.drawImage(img, 0, 0, width, height);
+
+        const imageData = ctx.getImageData(0, 0, width, height);
+        const data = imageData.data;
+
+        // Draw semi-transparent noise
+        for (let i = 0; i < data.length; i += 4) {
+            const value = Math.random() * 255;
+            data[i + 3] = value * 0.3; // 30% opacity for noise
+        }
+
+        // Add colored dots
+        const primaryColors = [
+            [255, 0, 0],    // Red
+            [255, 255, 0],  // Yellow
+            [0, 0, 255]     // Blue
+        ];
+
+        const numDots = 50;
+        for (let i = 0; i < numDots; i++) {
+            const x = Math.floor(Math.random() * width);
+            const y = Math.floor(Math.random() * height);
+            const color = primaryColors[Math.floor(Math.random() * primaryColors.length)];
+            const pixelIndex = (y * width + x) * 4;
+
+            // Draw a 2x2 pixel dot
+            for (let dy = 0; dy < 2; dy++) {
+                for (let dx = 0; dx < 2; dx++) {
+                    const index = pixelIndex + (dy * width + dx) * 4;
+                    if (index < data.length - 3) {
+                        data[index] = color[0];
+                        data[index + 1] = color[1];
+                        data[index + 2] = color[2];
+                        data[index + 3] = 255;
+                    }
+                }
+            }
+        }
+
+        ctx.putImageData(imageData, 0, 0);
+    };
+
+    const handleMouseEnter = (bookId: string) => {
+        isHovering.current[bookId] = true;
+        const canvas = canvasRefs.current[bookId];
+        if (!canvas) return;
+
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        const img = new Image();
+        img.src = books.find(b => b.id === bookId)?.coverImage || '';
+        img.onload = () => {
+            const animate = () => {
+                if (!isHovering.current[bookId]) return;
+                drawNoiseOverlay(ctx, img, canvas.width, canvas.height);
+                animationFrames.current[bookId] = requestAnimationFrame(animate);
+            };
+            animate();
+        };
+    };
+
+    const handleMouseLeave = (bookId: string) => {
+        isHovering.current[bookId] = false;
+        if (animationFrames.current[bookId]) {
+            cancelAnimationFrame(animationFrames.current[bookId]);
+        }
+
+        // Reset to original image
+        const canvas = canvasRefs.current[bookId];
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        const img = new Image();
+        img.src = books.find(b => b.id === bookId)?.coverImage || '';
+        img.onload = () => {
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        };
     };
 
     return (
@@ -320,41 +442,15 @@ const BooksListPage: React.FC = () => {
                 {viewMode === 'grid' && (
                     <div className="books-grid">
                         {books.map(book => (
-                            <Link 
-                                to={`/books/${book.id}`} 
+                            <StaticNoiseBookCard
                                 key={book.id}
-                                className="book-card"
-                            >
-                                <div className="book-cover-container">
-                                    <img 
-                                        src={book.coverImage} 
-                                        alt={book.title} 
-                                        className="book-cover"
-                                    />
-                                    <div className="book-overlay">
-                                        <div className="book-overlay-content">
-                                            <p className="book-description-preview">
-                                                {book.description.substring(0, 150)}...
-                                            </p>
-                                            <span className="view-details">View Details →</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="book-info">
-                                    <div className="book-main-info">
-                                        <h2>{book.title}</h2>
-                                        <span className="book-year">{book.publishYear}</span>
-                                    </div>
-                                    <div className="book-meta">
-                                        <span className="book-author">{book.author}</span>
-                                        {book.location && (
-                                            <span className="book-location-tag">
-                                                {book.location.city}
-                                            </span>
-                                        )}
-                                    </div>
-                                </div>
-                            </Link>
+                                id={book.id}
+                                title={book.title}
+                                author={book.author}
+                                publishYear={book.publishYear}
+                                coverImage={book.coverImage}
+                                location={book.location}
+                            />
                         ))}
                     </div>
                 )}

@@ -1,10 +1,99 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { HeroSection } from './components';
 import StaticTransition from '../common/StaticTransition';
 import { collages, books, diaryEntries } from '../../data';
 import * as d3 from 'd3';
 import './Homepage.css';
+
+const useScrambleText = (targetText: string, interval = 50, stepCount = 20, delay = 0) => {
+    const [displayText, setDisplayText] = useState('');
+    const [isAnimating, setIsAnimating] = useState(false);
+
+    useEffect(() => {
+        if (isAnimating) return;
+
+        // Wait for the specified delay before starting the animation
+        const delayTimeout = setTimeout(() => {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            const targetArray = targetText.split('');
+            let currentArray = Array(targetArray.length).fill('');
+            let step = 0;
+
+            setIsAnimating(true);
+
+            const scramble = () => {
+                if (step <= stepCount) {
+                    const scrambledArray = currentArray.map((char, index) =>
+                        Math.random() > step / stepCount ? chars[Math.floor(Math.random() * chars.length)] : targetArray[index]
+                    );
+
+                    currentArray = scrambledArray.map((char, index) =>
+                        scrambledArray[index] === targetArray[index] ? targetArray[index] : ''
+                    );
+
+                    setDisplayText(scrambledArray.join(''));
+
+                    step++;
+                    setTimeout(scramble, interval);
+                } else {
+                    setDisplayText(targetText);
+                    setIsAnimating(false);
+                }
+            };
+
+            scramble();
+        }, delay);
+
+        return () => {
+            clearTimeout(delayTimeout);
+            setIsAnimating(false);
+        };
+    }, [targetText, interval, stepCount, delay]);
+
+    return displayText;
+};
+
+const useTypewriter = (text: string, speed = 50, delay = 0) => {
+    const [displayText, setDisplayText] = useState('');
+    const [showCursor, setShowCursor] = useState(true);
+    const [isComplete, setIsComplete] = useState(false);
+
+    useEffect(() => {
+        let timeoutId: NodeJS.Timeout;
+        
+        const startTyping = () => {
+            let currentIndex = 0;
+            
+            const type = () => {
+                if (currentIndex <= text.length) {
+                    setDisplayText(text.slice(0, currentIndex));
+                    currentIndex++;
+                    timeoutId = setTimeout(type, speed);
+                } else {
+                    setIsComplete(true);
+                }
+            };
+            
+            type();
+        };
+
+        // Start after delay
+        const delayTimeout = setTimeout(startTyping, delay);
+
+        // Cursor blinking effect
+        const cursorInterval = setInterval(() => {
+            setShowCursor(prev => !prev);
+        }, 530);
+
+        return () => {
+            clearTimeout(timeoutId);
+            clearTimeout(delayTimeout);
+            clearInterval(cursorInterval);
+        };
+    }, [text, speed, delay]);
+
+    return { text: displayText, cursor: showCursor, isComplete };
+};
 
 interface HomepageProps {
     setIsNavbarVisible: (visible: boolean) => void;
@@ -18,6 +107,7 @@ interface NodeDatum {
     y?: number;
     fx?: number | null;
     fy?: number | null;
+    label?: string;
 }
 
 type NodeType = 'collage' | 'book' | 'diary';
@@ -37,12 +127,89 @@ const Homepage: React.FC<HomepageProps> = ({ setIsNavbarVisible, isNavbarVisible
     const networkRef = useRef<SVGSVGElement | null>(null);
     const navigate = useNavigate();
     const [visibleTypes, setVisibleTypes] = useState<Record<NodeType, boolean>>({
-        collage: true,
-        book: true,
-        diary: true
+        collage: false,
+        book: false,
+        diary: false
     });
     const [isVisible, setIsVisible] = useState(false);
     const [showTransition, setShowTransition] = useState(true);
+    const [currentText, setCurrentText] = useState('');
+    const [currentLabelType, setCurrentLabelType] = useState<NodeType | null>(null);
+    
+    // Start the scramble effect after the static transition
+    const scrambledTitle = useScrambleText("My Paper Stories", 50, 40, 1000);
+
+    // First sentence
+    const introText = useTypewriter(
+        "As I travel around the world, I collect fragments of stories in paper form.",
+        40, // Speed per character
+        2500 // Delay = static (1000) + scramble (2000) - 500ms overlap
+    );
+
+    // Second part starts after first part is complete
+    const secondText = useTypewriter(
+        "I hunt for books in second-hand shops and markets. When I find interesting ones, I write diary entries about them, and eventually create collages with their pages.",
+        40,
+        introText.isComplete ? 0 : 999999 // Only start when first part is complete
+    );
+
+    // Watch for keywords in the typed text and show corresponding nodes
+    useEffect(() => {
+        const fullText = introText.text + (introText.isComplete ? " " + secondText.text : "");
+        setCurrentText(fullText);
+
+        if (fullText.includes("books") && !visibleTypes.book) {
+            setVisibleTypes(prev => ({ ...prev, book: true }));
+            setCurrentLabelType('book');  // Show book titles immediately
+        }
+        
+        if (fullText.includes("diary entries") && !visibleTypes.diary) {
+            setVisibleTypes(prev => ({ ...prev, diary: true }));
+            setCurrentLabelType('diary');  // Show diary dates immediately
+        }
+        
+        if (fullText.includes("collages") && !visibleTypes.collage) {
+            setVisibleTypes(prev => ({ ...prev, collage: true }));
+            setCurrentLabelType('collage');  // Show collage titles immediately
+            
+            // After 2s, hide all labels and enable interactivity
+            const timer = setTimeout(() => {
+                setCurrentLabelType(null);
+            }, 2000);
+            return () => clearTimeout(timer);
+        }
+    }, [introText.text, secondText.text, visibleTypes]);
+
+    // Function to render clickable item with proper styling
+    const renderClickableItem = (type: NodeType, text: string, color: string) => (
+        <span 
+            className={`filter-item ${!visibleTypes[type] ? 'inactive' : ''}`}
+            onClick={() => toggleNodeType(type)}
+        >
+            <span 
+                className="color-square"
+                style={{ backgroundColor: color }}
+            />
+            <span className="filter-label">{text}</span>
+        </span>
+    );
+
+    // Function to process text and replace keywords with styled components
+    const processText = (text: string) => {
+        const parts = text.split(/(books|diary entries|collages)/);
+        return parts.map((part, index) => {
+            switch (part) {
+                case 'books':
+                    return renderClickableItem('book', 'books', '#0000ff');
+                case 'diary entries':
+                    return renderClickableItem('diary', 'diary entries', '#00ff00');
+                case 'collages':
+                    return renderClickableItem('collage', 'collages', '#ff0000');
+                default:
+                    return part;
+            }
+        });
+    };
 
     useEffect(() => {
         // Make the content ready but invisible immediately
@@ -72,26 +239,49 @@ const Homepage: React.FC<HomepageProps> = ({ setIsNavbarVisible, isNavbarVisible
             .attr('class', 'network-tooltip')
             .style('opacity', 0);
 
+        const width = networkRef.current.clientWidth;
+        const height = networkRef.current.clientHeight;
+        const centerX = width / 2;
+        const centerY = height / 2;
+
         // Create nodes array
         const nodes: NodeDatum[] = [];
         const links: LinkDatum[] = [];
 
-        // Add nodes based on visibility
+        // Add nodes based on visibility with initial center positions
         if (visibleTypes.book) {
             books.forEach(book => {
-                nodes.push({ id: book.id, type: 'book' });
+                nodes.push({ 
+                    id: book.id, 
+                    type: 'book',
+                    x: centerX,
+                    y: centerY,
+                    label: `${book.title} (${book.publishYear})`
+                });
             });
         }
 
         if (visibleTypes.collage) {
             collages.forEach(collage => {
-                nodes.push({ id: collage.id, type: 'collage' });
+                nodes.push({ 
+                    id: collage.id, 
+                    type: 'collage',
+                    x: centerX,
+                    y: centerY,
+                    label: collage.title
+                });
             });
         }
 
         if (visibleTypes.diary) {
             diaryEntries.forEach(diary => {
-                nodes.push({ id: diary.id, type: 'diary' });
+                nodes.push({ 
+                    id: diary.id, 
+                    type: 'diary',
+                    x: centerX,
+                    y: centerY,
+                    label: diary.date
+                });
             });
         }
 
@@ -104,7 +294,6 @@ const Homepage: React.FC<HomepageProps> = ({ setIsNavbarVisible, isNavbarVisible
                 collage.bookIds.forEach(bookId => {
                     const bookNode = nodes.find(n => n.id === bookId && n.type === 'book');
                     if (bookNode) {
-                        console.log(`Creating collage-book link: Collage "${collage.title}" -> Book "${books.find(b => b.id === bookId)?.title}"`);
                         links.push({
                             source: collageNode,
                             target: bookNode
@@ -123,7 +312,6 @@ const Homepage: React.FC<HomepageProps> = ({ setIsNavbarVisible, isNavbarVisible
                 book.diaryIds.forEach(diaryId => {
                     const diaryNode = nodes.find(n => n.id === diaryId && n.type === 'diary');
                     if (diaryNode) {
-                        console.log(`Creating book-diary link: Book "${book.title}" -> Diary "${diaryEntries.find(d => d.id === diaryId)?.title}"`);
                         links.push({
                             source: bookNode,
                             target: diaryNode
@@ -133,14 +321,14 @@ const Homepage: React.FC<HomepageProps> = ({ setIsNavbarVisible, isNavbarVisible
             });
         }
 
-        const width = networkRef.current.clientWidth;
-        const height = 500;
         const nodeSize = 8;
 
-        // Create SVG with zoom support
+        // Create SVG and container
         const svg = d3.select(networkRef.current)
             .attr('width', width)
             .attr('height', height);
+
+        const container = svg.append('g');
 
         // Add zoom behavior
         const zoom = d3.zoom<SVGSVGElement, unknown>()
@@ -151,65 +339,16 @@ const Homepage: React.FC<HomepageProps> = ({ setIsNavbarVisible, isNavbarVisible
 
         svg.call(zoom);
 
-        // Create container for nodes and links
-        const container = svg.append('g');
-
-        // Add zoom controls
-        const zoomControls = svg.append('g')
-            .attr('class', 'zoom-controls')
-            .attr('transform', `translate(20, ${height - 80})`);
-
-        zoomControls.append('rect')
-            .attr('width', 30)
-            .attr('height', 60)
-            .attr('rx', 5)
-            .attr('fill', 'white')
-            .attr('stroke', '#ccc');
-
-        // Zoom in button
-        zoomControls.append('g')
-            .attr('class', 'zoom-in')
-            .attr('transform', 'translate(0, 0)')
-            .on('click', () => {
-                svg.transition()
-                    .duration(300)
-                    .call(zoom.scaleBy as any, 1.3);
-            })
-            .append('text')
-            .attr('x', 15)
-            .attr('y', 20)
-            .attr('text-anchor', 'middle')
-            .text('+')
-            .style('font-size', '20px')
-            .style('cursor', 'pointer');
-
-        // Zoom out button
-        zoomControls.append('g')
-            .attr('class', 'zoom-out')
-            .attr('transform', 'translate(0, 30)')
-            .on('click', () => {
-                svg.transition()
-                    .duration(300)
-                    .call(zoom.scaleBy as any, 0.7);
-            })
-            .append('text')
-            .attr('x', 15)
-            .attr('y', 20)
-            .attr('text-anchor', 'middle')
-            .text('−')
-            .style('font-size', '20px')
-            .style('cursor', 'pointer');
-
-        // Create links
+        // Add links
         const link = container.append('g')
             .selectAll('line')
             .data(links)
             .join('line')
             .attr('stroke', '#999')
             .attr('stroke-opacity', 0.6)
-            .attr('class', 'network-link');
+            .attr('class', 'network-link entering');
 
-        // Create nodes
+        // Add nodes
         const node = container.append('g')
             .selectAll('rect')
             .data(nodes)
@@ -220,69 +359,58 @@ const Homepage: React.FC<HomepageProps> = ({ setIsNavbarVisible, isNavbarVisible
                 switch (d.type) {
                     case 'collage': return '#ff0000';
                     case 'book': return '#0000ff';
-                    case 'diary': return '#ffff00';
+                    case 'diary': return '#00ff00';
                 }
             })
-            .attr('class', 'network-node')
+            .attr('class', 'network-node entering')
+            .attr('x', centerX - nodeSize / 2)
+            .attr('y', centerY - nodeSize / 2)
             .style('cursor', 'pointer')
-            .call(d3.drag<SVGRectElement, NodeDatum>()
-                .on('start', (event, d) => {
-                    if (!event.active) simulation.alphaTarget(0.3).restart();
-                    d.fx = d.x;
-                    d.fy = d.y;
-                })
-                .on('drag', (event, d) => {
-                    d.fx = event.x;
-                    d.fy = event.y;
-                })
-                .on('end', (event, d) => {
-                    if (!event.active) simulation.alphaTarget(0);
-                    d.fx = null;
-                    d.fy = null;
-                }) as any)
-            .on('click', (event, d) => {
+            .on('click', function(event: any, d: any) {
                 // Prevent navigation if we're dragging
                 if (event.defaultPrevented) return;
 
                 // Hide tooltip immediately when clicking
                 tooltip.transition()
-                    .duration(0)  // Immediate transition
+                    .duration(0)
                     .style('opacity', 0);
 
                 // Navigate based on node type
-                switch (d.type) {
+                const node = d as NodeDatum;
+                switch (node.type) {
                     case 'collage':
-                        navigate(`/collages/${d.id}`);
+                        navigate(`/collages/${node.id}`);
                         break;
                     case 'book':
-                        navigate(`/books/${d.id}`);
+                        navigate(`/books/${node.id}`);
                         break;
                     case 'diary':
-                        navigate(`/diary/${d.id}`);
+                        navigate(`/diary/${node.id}`);
                         break;
                 }
             })
-            .on('mouseover', (event, d) => {
+            .on('mouseover', function(event: any, d: any) {
+                const node = d as NodeDatum;
                 let tooltipContent = '';
                 let nodeType = '';
                 
-                switch (d.type) {
+                switch (node.type) {
                     case 'book':
-                        const book = books.find(b => b.id === d.id);
+                        const book = books.find(b => b.id === node.id);
                         if (book) {
                             tooltipContent = `${book.title} (${book.publishYear})`;
                             nodeType = 'book-tooltip';
                         }
                         break;
                     case 'collage':
-                        const collage = collages.find(c => c.id === d.id);
+                        const collage = collages.find(c => c.id === node.id);
                         if (collage) {
                             tooltipContent = collage.title;
                             nodeType = 'collage-tooltip';
                         }
                         break;
                     case 'diary':
-                        const diary = diaryEntries.find(de => de.id === d.id);
+                        const diary = diaryEntries.find(de => de.id === node.id);
                         if (diary) {
                             tooltipContent = `${diary.title} - ${diary.date}`;
                             nodeType = 'diary-tooltip';
@@ -299,96 +427,95 @@ const Homepage: React.FC<HomepageProps> = ({ setIsNavbarVisible, isNavbarVisible
                     .html(tooltipContent)
                     .style('left', (event.pageX + 10) + 'px')
                     .style('top', (event.pageY - 10) + 'px');
-
-                // Gray out unrelated nodes and links
-                node.style('opacity', n => {
-                    // Check if this is the hovered node or connected to it
-                    if (n === d) return 1;
-                    const isConnected = links.some(link => 
-                        (link.source === d && link.target === n) ||
-                        (link.target === d && link.source === n)
-                    );
-                    return isConnected ? 1 : 0.2;
-                });
-
-                link.style('opacity', l => 
-                    (l.source === d || l.target === d) ? 1 : 0.1
-                );
             })
             .on('mouseout', () => {
                 tooltip.transition()
                     .duration(500)
                     .style('opacity', 0);
+            })
+            .call(d3.drag<SVGRectElement, NodeDatum>()
+                .on('start', (event, d) => {
+                    if (!event.active) simulation.alphaTarget(0.3).restart();
+                    d.fx = d.x;
+                    d.fy = d.y;
+                })
+                .on('drag', (event, d) => {
+                    d.fx = event.x;
+                    d.fy = event.y;
+                })
+                .on('end', (event, d) => {
+                    if (!event.active) simulation.alphaTarget(0);
+                    d.fx = null;
+                    d.fy = null;
+                }) as any);
 
-                // Reset all nodes and links opacity
-                node.style('opacity', 1);
-                link.style('opacity', 1);
-            });
+        // Add labels
+        const labels = container.append('g')
+            .selectAll('text')
+            .data(nodes)
+            .join('text')
+            .text(d => d.label || '')
+            .attr('class', d => `node-label ${d.type}-label ${d.type === currentLabelType ? 'visible' : 'fading'}`)
+            .attr('text-anchor', 'middle')
+            .attr('dy', 20);
 
-        // Force simulation with adjusted forces
+        // Trigger animations after a brief delay
+        setTimeout(() => {
+            container.selectAll('.network-node.entering')
+                .classed('entering', false)
+                .classed('visible', true);
+
+            container.selectAll('.network-link.entering')
+                .classed('entering', false)
+                .classed('visible', true);
+        }, 0);
+
+        // Force simulation
         const simulation = d3.forceSimulation(nodes)
-            // Link force with increased distance
             .force('link', d3.forceLink(links)
-                .distance(100)  // Increased distance between connected nodes
-                .strength(1)    // Maximum strength to maintain the desired distance
+                .distance(100)
+                .strength(1)
             )
-            // Charge force (repulsion between nodes)
             .force('charge', d3.forceManyBody()
-                .strength(-200)  // Stronger repulsion
-                .distanceMin(10) // Minimum distance for repulsion
-                .distanceMax(300) // Maximum distance for repulsion
+                .strength(-200)
+                .distanceMin(10)
+                .distanceMax(300)
             )
-            // Center force to pull nodes toward the center
             .force('center', d3.forceCenter(width / 2, height / 2)
-                .strength(0.1)  // Gentle pull toward center
+                .strength(0.1)
             )
-            // Collision force to prevent overlap
             .force('collision', d3.forceCollide()
                 .radius(nodeSize * 2)
-                .strength(1)    // Maximum strength to prevent overlap
+                .strength(1)
             )
-            // Boundary forces to keep nodes within the visible area
             .force('x', d3.forceX(width / 2)
-                .strength(0.05)  // Gentle force toward center x
+                .strength(0.05)
             )
             .force('y', d3.forceY(height / 2)
-                .strength(0.05)  // Gentle force toward center y
+                .strength(0.05)
             )
-            // Contain nodes within bounds
-            .force('bound', () => {
-                const padding = 50; // Padding from edges
-                nodes.forEach(node => {
-                    // Ensure x position stays within bounds
-                    if ((node as any).x < padding) (node as any).x = padding;
-                    if ((node as any).x > width - padding) (node as any).x = width - padding;
-                    // Ensure y position stays within bounds
-                    if ((node as any).y < padding) (node as any).y = padding;
-                    if ((node as any).y > height - padding) (node as any).y = height - padding;
-                });
-            })
             .on('tick', () => {
-                // Constrain node positions within bounds during tick
-                nodes.forEach(node => {
-                    const padding = 50;
-                    (node as any).x = Math.max(padding, Math.min(width - padding, (node as any).x));
-                    (node as any).y = Math.max(padding, Math.min(height - padding, (node as any).y));
-                });
-
+                // Update link positions
                 link
                     .attr('x1', d => (d.source as any).x)
                     .attr('y1', d => (d.source as any).y)
                     .attr('x2', d => (d.target as any).x)
                     .attr('y2', d => (d.target as any).y);
 
+                // Update node positions
                 node
                     .attr('x', d => (d as any).x - nodeSize / 2)
                     .attr('y', d => (d as any).y - nodeSize / 2);
+
+                // Update label positions
+                labels
+                    .attr('x', d => (d as any).x)
+                    .attr('y', d => (d as any).y);
             });
 
         // Initial simulation kick with higher alpha
         simulation.alpha(1).restart();
 
-        // Cleanup function
         return () => {
             tooltip.remove();
         };
@@ -404,7 +531,7 @@ const Homepage: React.FC<HomepageProps> = ({ setIsNavbarVisible, isNavbarVisible
     const buttonData: ButtonData[] = [
         { type: 'collage', label: 'Collages', color: '#ff0000' },
         { type: 'book', label: 'Books', color: '#0000ff' },
-        { type: 'diary', label: 'Diary Entries', color: '#ffff00' }
+        { type: 'diary', label: 'Diary Entries', color: '#00ff00' }
     ];
 
     return (
@@ -414,44 +541,27 @@ const Homepage: React.FC<HomepageProps> = ({ setIsNavbarVisible, isNavbarVisible
                 duration={800}
             />
             <div className={`homepage ${isVisible ? 'visible' : ''}`}>
-                <div className="network-visualization">
-                    <div className="network-intro">
-                        <h2>My Paper Stories</h2>
-                        <p>
-                            As I travel around the world, I collect fragments of stories in paper form. 
-                            I hunt for <span 
-                                className={`filter-item ${!visibleTypes.book ? 'inactive' : ''}`}
-                                onClick={() => toggleNodeType('book')}
-                            >
-                                <span 
-                                    className="color-square"
-                                    style={{ backgroundColor: '#0000ff' }}
-                                />
-                                <span className="filter-label">books</span>
-                            </span> in second-hand shops and markets. 
-                            When I find interesting ones, I write <span 
-                                className={`filter-item ${!visibleTypes.diary ? 'inactive' : ''}`}
-                                onClick={() => toggleNodeType('diary')}
-                            >
-                                <span 
-                                    className="color-square"
-                                    style={{ backgroundColor: '#ffff00' }}
-                                />
-                                <span className="filter-label">diary entries</span>
-                            </span> about them, 
-                            and eventually create <span 
-                                className={`filter-item ${!visibleTypes.collage ? 'inactive' : ''}`}
-                                onClick={() => toggleNodeType('collage')}
-                            >
-                                <span 
-                                    className="color-square"
-                                    style={{ backgroundColor: '#ff0000' }}
-                                />
-                                <span className="filter-label">collages</span>
-                            </span> with their pages.
-                        </p>
+                <div className="homepage-content">
+                    <div className="text-section">
+                        <div className="network-intro">
+                            <h2 className="scramble-text">{scrambledTitle}</h2>
+                            <p className="typewriter-text">
+                                {introText.text}
+                                {introText.isComplete && (
+                                    <>{" "}{processText(secondText.text)}</>
+                                )}
+                                <span className={`cursor ${
+                                    (!introText.isComplete || !secondText.isComplete) && 
+                                    (introText.isComplete ? secondText.cursor : introText.cursor) 
+                                        ? 'visible' 
+                                        : ''
+                                }`}>|</span>
+                            </p>
+                        </div>
                     </div>
-                    <svg ref={networkRef} className="network-graph"></svg>
+                    <div className="network-section">
+                        <svg ref={networkRef} className="network-graph"></svg>
+                    </div>
                 </div>
             </div>
         </>

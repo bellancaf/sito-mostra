@@ -123,6 +123,5 @@
 
 .related-books,
 .related-collages {
-    background-color: var(--color-background);
     margin-bottom: var(--spacing-8);
 } 

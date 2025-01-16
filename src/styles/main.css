@@ -78,10 +78,6 @@ body {
     font-family: var(--font-family-base);
 }
 
-/* Update network graph colors */
-.network-graph {
-    background: var(--network-background);
-}
 
 .network-link {
     stroke: var(--network-link) !important;

@@ -21,7 +21,7 @@ export const books: Book[] = [
         title: "Parcours Enchantés",
         author: "Gilles Beutrolles",
         publishYear: 2010,
-        coverImage: "/images/books/parcours_enchantes.png",
+        coverImage: "/images/books/parcours_enchantes.jpg",
         description: "A man is arrested and prosecuted by a remote authority without ever knowing the crime he committed.",
         diaryIds: ["diary1"],
         location: {
@@ -51,7 +51,7 @@ export const books: Book[] = [
         title: "Les années mémoire 1920",
         author: "Larousse",
         publishYear: 1987,
-        coverImage: "/images/books/les_annees_memoire_1920.png",
+        coverImage: "/images/books/les_annees_memoire_1920.jpg",
         description: "A fun recollection of the 1920s",
         diaryIds: ["diary1"],
         location: {
@@ -66,7 +66,7 @@ export const books: Book[] = [
         title: "Floorplan via degli oleandri",
         author: "Unknown",
         publishYear: 1960,
-        coverImage: "/images/books/condono_via_oleandri.png",
+        coverImage: "/images/books/condono_via_oleandri.jpg",
         description: "Architectural floorplan of via degli oleandri.",
         diaryIds: [],
         location: {
@@ -81,7 +81,7 @@ export const books: Book[] = [
         title: "Programming Zine",
         author: "Various",
         publishYear: 2023,
-        coverImage: "/images/books/programming_zine.png", 
+        coverImage: "/images/books/programming_zine.jpg", 
         description: "A smart and heartfelt cyberfeminist zine discovered in a Dalston bookshop.",
         diaryIds: ["diary1"],
         location: {
@@ -165,7 +165,7 @@ export const books: Book[] = [
         title: "Parcours Enchantés",
         author: "-",
         publishYear: 1970,
-        coverImage: "/images/books/parcours_enchantes.png", 
+        coverImage: "/images/books/parcours_enchantes.jpg", 
         description: "So much space, water and trees spent for silly people burning the world as they touch their expensive grass..",
         diaryIds: ["diary1"]
     },
@@ -174,7 +174,7 @@ export const books: Book[] = [
         title: "Bluff, atroce nuit",
         author: "-",
         publishYear: 1960,
-        coverImage: "/images/books/bluff_atroce_nuit.png", 
+        coverImage: "/images/books/bluff_atroce_nuit.jpg", 
         description: "A graphic novel with photos? The actors are weirdly plastic-y, the stories are about these incredibly conforming, boringly problematic love stories. Issa weird.",
         diaryIds: ["diary1"]
     },
@@ -183,7 +183,7 @@ export const books: Book[] = [
         title: "Cartes postales et collection",
         author: "PC",
         publishYear: 1989,
-        coverImage: "/images/books/cartes_postales_1989.png",
+        coverImage: "/images/books/cartes_postales_1989.jpg",
         description: "A collection of postcards and ads from the 80s in France.",
         diaryIds: ["diary1"]
     }

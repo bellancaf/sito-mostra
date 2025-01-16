@@ -1,11 +1,13 @@
 .app {
-    padding-top: 84px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: transparent;
 }
 
 main {
-    min-height: calc(100vh - 84px);
-    opacity: 0;
-    animation: fadeIn 0.5s ease forwards;
+    flex: 1;
+    background: transparent;
 }
 
 @keyframes fadeIn {

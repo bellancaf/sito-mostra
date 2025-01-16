@@ -33,11 +33,19 @@
     z-index: 1000;
 }
 
+.footer {
+    width: 100%;
+    padding: var(--spacing-4);
+    background: transparent;
+}
+
 .footer-content {
-    background-color: var(--color-background);
-    padding: var(--spacing-2);
-    border-top: 2px solid var(--color-gray-200);
-    backdrop-filter: blur(5px);
+    max-width: 1800px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: transparent;
 }
 
 .footer-inner {

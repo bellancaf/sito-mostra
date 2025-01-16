@@ -1,0 +1,12 @@
+.page-content {
+    opacity: 0;
+    transition: opacity 1s ease;
+    visibility: hidden;
+    min-height: 100vh;
+}
+
+.page-content.visible {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 1s ease, visibility 0s ease 0s;
+} 

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { HeroSection } from './components';
+import StaticTransition from '../common/StaticTransition';
 import { collages, books, diaryEntries } from '../../data';
 import * as d3 from 'd3';
 import './Homepage.css';
@@ -40,10 +41,24 @@ const Homepage: React.FC<HomepageProps> = ({ setIsNavbarVisible, isNavbarVisible
         book: true,
         diary: true
     });
+    const [isVisible, setIsVisible] = useState(false);
+    const [showTransition, setShowTransition] = useState(true);
 
     useEffect(() => {
-        createNetworkVisualization();
-    }, [visibleTypes]);
+        // Make the content ready but invisible immediately
+        setIsVisible(true);
+        
+        // After 1 second, start fading out the static
+        setTimeout(() => {
+            setShowTransition(false);
+        }, 1000);
+    }, []);
+
+    useEffect(() => {
+        if (isVisible) {
+            createNetworkVisualization();
+        }
+    }, [visibleTypes, isVisible]);
 
     const createNetworkVisualization = () => {
         if (!networkRef.current) return;
@@ -393,47 +408,53 @@ const Homepage: React.FC<HomepageProps> = ({ setIsNavbarVisible, isNavbarVisible
     ];
 
     return (
-        <div className="homepage">
-            <div className="network-visualization">
-                <div className="network-intro">
-                    <h2>My Paper Stories</h2>
-                    <p>
-                        As I travel around the world, I collect fragments of stories in paper form. 
-                        I hunt for <span 
-                            className={`filter-item ${!visibleTypes.book ? 'inactive' : ''}`}
-                            onClick={() => toggleNodeType('book')}
-                        >
-                            <span 
-                                className="color-square"
-                                style={{ backgroundColor: '#0000ff' }}
-                            />
-                            <span className="filter-label">books</span>
-                        </span> in second-hand shops and markets. 
-                        When I find interesting ones, I write <span 
-                            className={`filter-item ${!visibleTypes.diary ? 'inactive' : ''}`}
-                            onClick={() => toggleNodeType('diary')}
-                        >
-                            <span 
-                                className="color-square"
-                                style={{ backgroundColor: '#ffff00' }}
-                            />
-                            <span className="filter-label">diary entries</span>
-                        </span> about them, 
-                        and eventually create <span 
-                            className={`filter-item ${!visibleTypes.collage ? 'inactive' : ''}`}
-                            onClick={() => toggleNodeType('collage')}
-                        >
-                            <span 
-                                className="color-square"
-                                style={{ backgroundColor: '#ff0000' }}
-                            />
-                            <span className="filter-label">collages</span>
-                        </span> with their pages.
-                    </p>
+        <>
+            <StaticTransition 
+                isVisible={showTransition} 
+                duration={800}
+            />
+            <div className={`homepage ${isVisible ? 'visible' : ''}`}>
+                <div className="network-visualization">
+                    <div className="network-intro">
+                        <h2>My Paper Stories</h2>
+                        <p>
+                            As I travel around the world, I collect fragments of stories in paper form. 
+                            I hunt for <span 
+                                className={`filter-item ${!visibleTypes.book ? 'inactive' : ''}`}
+                                onClick={() => toggleNodeType('book')}
+                            >
+                                <span 
+                                    className="color-square"
+                                    style={{ backgroundColor: '#0000ff' }}
+                                />
+                                <span className="filter-label">books</span>
+                            </span> in second-hand shops and markets. 
+                            When I find interesting ones, I write <span 
+                                className={`filter-item ${!visibleTypes.diary ? 'inactive' : ''}`}
+                                onClick={() => toggleNodeType('diary')}
+                            >
+                                <span 
+                                    className="color-square"
+                                    style={{ backgroundColor: '#ffff00' }}
+                                />
+                                <span className="filter-label">diary entries</span>
+                            </span> about them, 
+                            and eventually create <span 
+                                className={`filter-item ${!visibleTypes.collage ? 'inactive' : ''}`}
+                                onClick={() => toggleNodeType('collage')}
+                            >
+                                <span 
+                                    className="color-square"
+                                    style={{ backgroundColor: '#ff0000' }}
+                                />
+                                <span className="filter-label">collages</span>
+                            </span> with their pages.
+                        </p>
+                    </div>
+                    <svg ref={networkRef} className="network-graph"></svg>
                 </div>
-                <svg ref={networkRef} className="network-graph"></svg>
             </div>
-        </div>
+        </>
     );
 };
 

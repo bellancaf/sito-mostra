@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { books, getCollagesForBook } from '../../data';
 import * as d3 from 'd3';
 import './BooksListPage.css';
@@ -33,6 +33,7 @@ const BooksListPage: React.FC = () => {
     const canvasRefs = useRef<{ [key: string]: HTMLCanvasElement | null }>({});
     const animationFrames = useRef<{ [key: string]: number }>({});
     const isHovering = useRef<{ [key: string]: boolean }>({});
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (viewMode === 'network') {
@@ -45,7 +46,7 @@ const BooksListPage: React.FC = () => {
 
         const width = networkRef.current.clientWidth || 1200;
         const height = 600;
-        const nodeSize = 120;
+        const nodeSize = 100;
 
         // Add zoom behavior
         const zoom = d3.zoom<SVGSVGElement, unknown>()
@@ -62,17 +63,13 @@ const BooksListPage: React.FC = () => {
 
         svg.selectAll("*").remove();
 
+        // Create defs first for patterns
+        const defs = svg.append('defs');
+
         // Create a container group for all elements
         const container = svg.append('g')
             .attr('transform', `translate(${width/2},${height/2})`);
 
-        // First create a group for links (to ensure they're behind nodes)
-        const linksGroup = container.append('g').attr('class', 'links');
-        const nodesGroup = container.append('g').attr('class', 'nodes');
-
-        // Create patterns for book covers with static noise
-        const defs = svg.append('defs');
-        
         // Create nodes from books
         const nodes: NodeDatum[] = books.map(book => ({
             id: book.id,
@@ -95,14 +92,14 @@ const BooksListPage: React.FC = () => {
                         links.push({ 
                             source: nodes[i], 
                             target: nodes[j],
-                            strength: sharedCollages.length // Add strength based on number of shared collages
+                            strength: sharedCollages.length
                         });
                     }
                 }
             });
         });
 
-        // Create static noise patterns for each book
+        // Create patterns for book covers with static noise
         nodes.forEach(node => {
             const pattern = defs.append('pattern')
                 .attr('id', `cover-${node.id}`)
@@ -164,21 +161,16 @@ const BooksListPage: React.FC = () => {
             img.src = node.coverImage;
         });
 
-        // Create the force simulation
-        const simulation = d3.forceSimulation<NodeDatum>(nodes)
-            .force('link', d3.forceLink<NodeDatum, LinkDatum>(links)
-                .id(d => d.id)
-                .distance(200) // Increased distance
-                .strength(d => (d.strength || 1) * 0.5)) // Use link strength
-            .force('charge', d3.forceManyBody()
-                .strength(-1000)) // Stronger repulsion
-            .force('collide', d3.forceCollide()
-                .radius(nodeSize * 0.8)
-                .strength(0.8))
-            .force('x', d3.forceX().strength(0.1))
-            .force('y', d3.forceY().strength(0.1));
+        // Create nodes group first but don't draw yet
+        const nodesGroup = container.append('g')
+            .attr('class', 'nodes-group');
 
-        // Draw links FIRST (so they're behind)
+        // Create and draw links group
+        const linksGroup = container.append('g')
+            .attr('class', 'links-group')
+            .lower(); // Force links to back
+
+        // Draw all links
         const link = linksGroup.selectAll('line')
             .data(links)
             .join('line')
@@ -186,22 +178,49 @@ const BooksListPage: React.FC = () => {
             .attr('stroke-opacity', 0.6)
             .attr('stroke-width', d => Math.sqrt((d.strength || 1) * 2));
 
-        // Draw nodes SECOND (so they're on top)
+        // Draw all nodes
         const node = nodesGroup.selectAll('g')
             .data(nodes)
             .join('g')
+            .style('cursor', 'pointer') // Add pointer cursor
+            .on('click', (event, d) => {
+                navigate(`/books/${d.id}`);
+            })
             .call(d3.drag<SVGGElement, NodeDatum>()
                 .on('start', dragstarted)
                 .on('drag', dragged)
                 .on('end', dragended) as any);
 
-        // Add rectangles with book covers (no rounded corners)
+        // Add white background rectangles to ensure links are hidden
+        node.append('rect')
+            .attr('width', nodeSize)
+            .attr('height', nodeSize)
+            .attr('x', -nodeSize/2)
+            .attr('y', -nodeSize/2)
+            .attr('fill', 'white');
+
+        // Add rectangles with book covers
         node.append('rect')
             .attr('width', nodeSize)
             .attr('height', nodeSize)
             .attr('x', -nodeSize/2)
             .attr('y', -nodeSize/2)
             .attr('fill', d => `url(#cover-${d.id})`);
+
+        // Create the force simulation
+        const simulation = d3.forceSimulation<NodeDatum>(nodes)
+            .force('link', d3.forceLink<NodeDatum, LinkDatum>(links)
+                .id(d => d.id)
+                .distance(200)
+                .strength(d => (d.strength || 1) * 0.1)) // Further reduced link strength
+            .force('charge', d3.forceManyBody()
+                .strength(-300)) // Further reduced repulsion
+            .force('collide', d3.forceCollide()
+                .radius(nodeSize * 0.8)
+                .strength(0.3)) // Further reduced collision strength
+            .force('x', d3.forceX().strength(0.02)) // Further reduced centering force
+            .force('y', d3.forceY().strength(0.02)) // Further reduced centering force
+            .velocityDecay(0.6); // Increased velocity decay for slower movement
 
         // Add hover interaction for static noise effect
         node.on('mouseenter', function(event, d) {
@@ -214,8 +233,16 @@ const BooksListPage: React.FC = () => {
 
             const img = new Image();
             img.onload = () => {
+                let lastDrawTime = performance.now();
                 function animate() {
                     if (!ctx) return;
+                    
+                    const now = performance.now();
+                    if (now - lastDrawTime < 100) { // Match the 100ms delay from grid view
+                        d.animationFrame = requestAnimationFrame(animate);
+                        return;
+                    }
+                    lastDrawTime = now;
                     
                     // Draw image
                     ctx.drawImage(img, 0, 0, nodeSize, nodeSize);
@@ -270,16 +297,52 @@ const BooksListPage: React.FC = () => {
                 delete d.animationFrame;
             }
             
-            // Reset to original image
+            // Draw one static frame of noise instead of resetting to original image
             const pattern = defs.select(`#cover-${d.id}`);
+            const canvas = document.createElement('canvas');
+            canvas.width = nodeSize;
+            canvas.height = nodeSize;
+            const ctx = canvas.getContext('2d');
+            if (!ctx) return;
+
             const img = new Image();
             img.onload = () => {
-                const canvas = document.createElement('canvas');
-                canvas.width = nodeSize;
-                canvas.height = nodeSize;
-                const ctx = canvas.getContext('2d');
-                if (!ctx) return;
+                // Draw image
                 ctx.drawImage(img, 0, 0, nodeSize, nodeSize);
+                
+                // Add static noise
+                const imageData = ctx.getImageData(0, 0, nodeSize, nodeSize);
+                const data = imageData.data;
+
+                // Add semi-transparent noise
+                for (let i = 0; i < data.length; i += 4) {
+                    const value = Math.random() * 255;
+                    data[i + 3] = value * 0.3;
+                }
+
+                // Add colored dots
+                const primaryColors = [[255, 0, 0], [255, 255, 0], [0, 0, 255]];
+                const numDots = 15;
+                for (let i = 0; i < numDots; i++) {
+                    const x = Math.floor(Math.random() * nodeSize);
+                    const y = Math.floor(Math.random() * nodeSize);
+                    const color = primaryColors[Math.floor(Math.random() * primaryColors.length)];
+                    const pixelIndex = (y * nodeSize + x) * 4;
+                    
+                    for (let dy = 0; dy < 2; dy++) {
+                        for (let dx = 0; dx < 2; dx++) {
+                            const index = pixelIndex + (dy * nodeSize + dx) * 4;
+                            if (index < data.length - 3) {
+                                data[index] = color[0];
+                                data[index + 1] = color[1];
+                                data[index + 2] = color[2];
+                                data[index + 3] = 255;
+                            }
+                        }
+                    }
+                }
+
+                ctx.putImageData(imageData, 0, 0);
                 pattern.select('image')
                     .attr('href', canvas.toDataURL());
             };
@@ -287,7 +350,7 @@ const BooksListPage: React.FC = () => {
         });
 
         function dragstarted(event: any) {
-            if (!event.active) simulation.alphaTarget(0.3).restart();
+            if (!event.active) simulation.alphaTarget(0.1).restart(); // Reduced alpha target
             event.subject.fx = event.subject.x;
             event.subject.fy = event.subject.y;
         }
@@ -467,4 +530,4 @@ const BooksListPage: React.FC = () => {
     );
 };
 
-export default BooksListPage; 
+export default BooksListPage;

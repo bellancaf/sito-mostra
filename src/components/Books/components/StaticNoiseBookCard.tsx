@@ -2,6 +2,73 @@ import React, { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import './StaticNoiseBookCard.css';
 
+export const drawStaticNoise = (
+    ctx: CanvasRenderingContext2D,
+    img: HTMLImageElement,
+    width: number,
+    height: number,
+    isAnimated: boolean,
+    lastDrawTime: { current: number },
+    isHoveringRef: { current: boolean },
+    animationFrameRef: { current: number | undefined }
+) => {
+    const now = performance.now();
+    if (isAnimated && now - lastDrawTime.current < 100) {
+        animationFrameRef.current = requestAnimationFrame(() => 
+            drawStaticNoise(ctx, img, width, height, isAnimated, lastDrawTime, isHoveringRef, animationFrameRef)
+        );
+        return;
+    }
+    lastDrawTime.current = now;
+
+    // Draw the image first
+    ctx.drawImage(img, 0, 0, width, height);
+
+    const imageData = ctx.getImageData(0, 0, width, height);
+    const data = imageData.data;
+
+    // Draw semi-transparent noise with much lower opacity
+    for (let i = 0; i < data.length; i += 4) {
+        const value = Math.random() * 255;
+        data[i + 3] = value * 0.90; // Reduced from 0.3 to 0.15 for more transparency
+    }
+
+    // Add colored dots with reduced opacity
+    const primaryColors = [
+        [255, 0, 0],    // Red
+        [0, 255, 0],    // Green
+        [0, 0, 255]     // Blue
+    ];
+
+    const numDots = 20; // Reduced number of dots
+    for (let i = 0; i < numDots; i++) {
+        const x = Math.floor(Math.random() * width);
+        const y = Math.floor(Math.random() * height);
+        const color = primaryColors[Math.floor(Math.random() * primaryColors.length)];
+        const pixelIndex = (y * width + x) * 4;
+
+        for (let dy = 0; dy < 2; dy++) {
+            for (let dx = 0; dx < 2; dx++) {
+                const index = pixelIndex + (dy * width + dx) * 4;
+                if (index < data.length - 3) {
+                    data[index] = color[0];
+                    data[index + 1] = color[1];
+                    data[index + 2] = color[2];
+                    data[index + 3] = 180; // Reduced opacity for colored dots
+                }
+            }
+        }
+    }
+
+    ctx.putImageData(imageData, 0, 0);
+
+    if (isAnimated && isHoveringRef.current) {
+        animationFrameRef.current = requestAnimationFrame(() => 
+            drawStaticNoise(ctx, img, width, height, isAnimated, lastDrawTime, isHoveringRef, animationFrameRef)
+        );
+    }
+};
+
 interface StaticNoiseBookCardProps {
     id: string;
     title: string;
@@ -22,8 +89,10 @@ const StaticNoiseBookCard: React.FC<StaticNoiseBookCardProps> = ({
     location
 }) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const animationFrameRef = useRef<NodeJS.Timeout>();
+    const animationFrameRef = useRef<number>();
     const isHoveringRef = useRef(false);
+    const imageRef = useRef<HTMLImageElement>();
+    const lastDrawTime = useRef<number>(0);
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -34,73 +103,19 @@ const StaticNoiseBookCard: React.FC<StaticNoiseBookCardProps> = ({
 
         const img = new Image();
         img.src = coverImage;
+        imageRef.current = img;
         
         img.onload = () => {
             // Initial draw with static noise
-            drawStaticNoise(ctx, img, false);
+            drawStaticNoise(ctx, img, canvas.width, canvas.height, false, lastDrawTime, isHoveringRef, animationFrameRef);
         };
 
         return () => {
             if (animationFrameRef.current) {
-                clearTimeout(animationFrameRef.current);
+                cancelAnimationFrame(animationFrameRef.current);
             }
         };
     }, [coverImage]);
-
-    const drawStaticNoise = (
-        ctx: CanvasRenderingContext2D,
-        img: HTMLImageElement,
-        isAnimated: boolean
-    ) => {
-        // Draw the image first
-        ctx.drawImage(img, 0, 0, ctx.canvas.width, ctx.canvas.height);
-
-        const imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
-        const data = imageData.data;
-
-        // Draw semi-transparent noise
-        for (let i = 0; i < data.length; i += 4) {
-            const value = Math.random() * 255;
-            data[i + 3] = value * 0.3; // 30% opacity for noise
-        }
-
-        // Add colored dots
-        const primaryColors = [
-            [255, 0, 0],    // Red
-            [255, 255, 0],  // Yellow
-            [0, 0, 255]     // Blue
-        ];
-
-        const numDots = 30; // Reduced number of dots
-        for (let i = 0; i < numDots; i++) {
-            const x = Math.floor(Math.random() * ctx.canvas.width);
-            const y = Math.floor(Math.random() * ctx.canvas.height);
-            const color = primaryColors[Math.floor(Math.random() * primaryColors.length)];
-            const pixelIndex = (y * ctx.canvas.width + x) * 4;
-
-            // Draw a 2x2 pixel dot
-            for (let dy = 0; dy < 2; dy++) {
-                for (let dx = 0; dx < 2; dx++) {
-                    const index = pixelIndex + (dy * ctx.canvas.width + dx) * 4;
-                    if (index < data.length - 3) {
-                        data[index] = color[0];
-                        data[index + 1] = color[1];
-                        data[index + 2] = color[2];
-                        data[index + 3] = 255;
-                    }
-                }
-            }
-        }
-
-        ctx.putImageData(imageData, 0, 0);
-
-        if (isAnimated && isHoveringRef.current) {
-            // Slower animation - update every 12 frames instead of 6
-            animationFrameRef.current = setTimeout(() => {
-                requestAnimationFrame(() => drawStaticNoise(ctx, img, true));
-            }, 100); // Increased delay for slower animation
-        }
-    };
 
     const handleMouseEnter = () => {
         isHoveringRef.current = true;
@@ -110,17 +125,18 @@ const StaticNoiseBookCard: React.FC<StaticNoiseBookCardProps> = ({
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
 
-        const img = new Image();
-        img.src = coverImage;
-        img.onload = () => {
-            drawStaticNoise(ctx, img, true);
-        };
+        if (imageRef.current) {
+            if (animationFrameRef.current) {
+                cancelAnimationFrame(animationFrameRef.current);
+            }
+            drawStaticNoise(ctx, imageRef.current, canvas.width, canvas.height, true, lastDrawTime, isHoveringRef, animationFrameRef);
+        }
     };
 
     const handleMouseLeave = () => {
         isHoveringRef.current = false;
         if (animationFrameRef.current) {
-            clearTimeout(animationFrameRef.current);
+            cancelAnimationFrame(animationFrameRef.current);
         }
 
         const canvas = canvasRef.current;
@@ -129,12 +145,9 @@ const StaticNoiseBookCard: React.FC<StaticNoiseBookCardProps> = ({
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
 
-        const img = new Image();
-        img.src = coverImage;
-        img.onload = () => {
-            // Draw one frame of static noise without animation
-            drawStaticNoise(ctx, img, false);
-        };
+        if (imageRef.current) {
+            drawStaticNoise(ctx, imageRef.current, canvas.width, canvas.height, false, lastDrawTime, isHoveringRef, animationFrameRef);
+        }
     };
 
     return (
@@ -154,17 +167,11 @@ const StaticNoiseBookCard: React.FC<StaticNoiseBookCardProps> = ({
             <div className="card-info">
                 <div className="card-main-info">
                     <h2>{title}</h2>
-                    <span className="card-year">{publishYear}</span>
                 </div>
-                <div className="card-meta">
-                    <span className="card-author">{author}</span>
-                    {location && (
-                        <span className="card-location">{location.city}</span>
-                    )}
-                </div>
+                <span className="card-year">{publishYear}</span>
             </div>
         </Link>
     );
 };
 
-export default StaticNoiseBookCard; 
+export default StaticNoiseBookCard;

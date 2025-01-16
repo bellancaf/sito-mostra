@@ -1,6 +1,15 @@
 .homepage {
 	width: 100%;
 	height: 100%;
+	opacity: 0;
+	transition: opacity 1s ease;
+	visibility: hidden;
+}
+
+.homepage.visible {
+	opacity: 1;
+	visibility: visible;
+	transition: opacity 1s ease, visibility 0s ease 0s;
 }
 
 .network-visualization {

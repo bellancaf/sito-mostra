@@ -82,8 +82,8 @@
 /* Grid View Styles */
 .books-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: var(--spacing-8);
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: var(--spacing-6);
     padding: var(--spacing-4);
 }
 
@@ -231,15 +231,24 @@
 
 @media (max-width: 768px) {
     .books-grid {
-        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
         gap: var(--spacing-4);
     }
 } 
 
 .books-network {
     width: 100%;
-    height: 600px; /* Reduced height */
-    border: 2px solid var(--color-gray-200);
-    margin-top: var(--spacing-4);
-    overflow: visible; /* Allow nodes to overflow */
+    height: 600px;
+}
+
+.links-group {
+    z-index: 1;
+}
+
+.nodes-group {
+    z-index: 2;
+}
+
+.nodes-group rect {
+    z-index: 2;
 } 

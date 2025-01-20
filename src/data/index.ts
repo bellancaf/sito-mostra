@@ -7,13 +7,13 @@ export const books: Book[] = [
         author: "Tresor",
         publishYear: 1988,
         coverImage: "/images/books/la_guerre_dalgerie_54-62.png",
-        description: "A salesman wakes up one morning to find himself transformed into a giant insect.",
-        diaryIds: ["diary2", "diary3"],
+        description: "Retrospective on the Alegiran's War",
+        diaryIds: ["diary2"],
         location: {
             country: "France",
-            city: "Paris",
+            city: "Dunkirk",
             coordinates: [48.8566, 2.3522],
-            name: "Marché aux Puces de Saint-Ouen"
+            name: "Hammmaüs"
         }
     },
     {
@@ -22,13 +22,13 @@ export const books: Book[] = [
         author: "Gilles Beutrolles",
         publishYear: 2010,
         coverImage: "/images/books/parcours_enchantes.jpg",
-        description: "A man is arrested and prosecuted by a remote authority without ever knowing the crime he committed.",
-        diaryIds: ["diary1"],
+        description: "Big photos of big golf parks for people with big dicks",
+        diaryIds: ["diary2"],
         location: {
             country: "France",
-            city: "Paris",
+            city: "Dunkirk",
             coordinates: [48.8566, 2.3522],
-            name: "Shakespeare and Company"
+            name: "Hammmaüs"
         }
     },
     {
@@ -38,7 +38,7 @@ export const books: Book[] = [
         publishYear: 1980,
         coverImage: "/images/books/algerie_guerre_sans_images.png",
         description: "A photobook about the Algerian war",
-        diaryIds: ["diary3"],
+        diaryIds: ["diary2"],
         location: {
             country: "France",
             city: "Paris",
@@ -53,12 +53,12 @@ export const books: Book[] = [
         publishYear: 1987,
         coverImage: "/images/books/les_annees_memoire_1920.jpg",
         description: "A fun recollection of the 1920s",
-        diaryIds: ["diary1"],
+        diaryIds: ["diary2"],
         location: {
             country: "France",
             city: "Dunkirk",
             coordinates: [51.0343, 2.3767],
-            name: "Marché aux Puces de Dunkerque"
+            name: ""
         }
     },
     {
@@ -68,12 +68,12 @@ export const books: Book[] = [
         publishYear: 1960,
         coverImage: "/images/books/condono_via_oleandri.jpg",
         description: "Architectural floorplan of via degli oleandri.",
-        diaryIds: [],
+        diaryIds: ["diary7"],
         location: {
             country: "Italy",
-            city: "Sassetta",
+            city: "Livonro",
             coordinates: [43.0733, 10.6447],
-            name: "Nonna Albina's House"
+            name: "Via della querceta"
         }
     },
     {
@@ -98,12 +98,12 @@ export const books: Book[] = [
         publishYear: 1927,
         coverImage: "/images/books/noi_mondo_nov_27.png", 
         description: "November 1927, a number of articles on <races>, some fun comments on the italian cinema production and a deep dive on living on an oil ship and what was the fashion about beards and man hairstyle. There's also a little commentary on women's wearing pants.",
-        diaryIds: ["diary4"],
+        diaryIds: ["diary1"],
         location: {
             country: "Italy",
-            city: "Rome",
+            city: "Sasssetta",
             coordinates: [41.9028, 12.4964],
-            name: "Rome Warehouse Shop"
+            name: "Casa"
         }
     },
     {
@@ -116,9 +116,9 @@ export const books: Book[] = [
         diaryIds: ["diary4"],
         location: {
             country: "Italy",
-            city: "Sassetta",
+            city: "Rome",
             coordinates: [43.0733, 10.6447],
-            name: "Nonna Albina's House"
+            name: "Second Hand market"
         }
     },
     {
@@ -128,12 +128,12 @@ export const books: Book[] = [
         publishYear: 1972,
         coverImage: "/images/books/revue_mondiale_1970.png", 
         description: "A review of 1970. A recent history work published in 1972, a fantastic insight of what the institutionalised media in France thought of the world.",
-        diaryIds: ["diary4"],
+        diaryIds: ["diary3"],
         location: {
             country: "Italy",
-            city: "Livorno",
+            city: "Bergue",
             coordinates: [43.5485, 10.3106],
-            name: "Second-hand Store near Basketball Arena"
+            name: "Second-hand Store"
         }
     },
     {
@@ -143,12 +143,12 @@ export const books: Book[] = [
         publishYear: 1970,
         coverImage: "/images/books/histoire_vecue_de_la_resistance.png", 
         description: "An amazing collection of small zines, found letters, newspapers and other documents. It tells the story of the resistence in France during WWII. Definitely part of the effort to talk about how everyonie was part of the resistance and nobody was collaborating but still...",
-        diaryIds: ["diary4"],
+        diaryIds: ["diary2"],
         location: {
-            country: "Italy",
-            city: "Rome",
+            country: "France",
+            city: "Dunkrik",
             coordinates: [41.9028, 12.4964],
-            name: "Accademia Book Market"
+            name: "Hemmaüs"
         }
     },
     {
@@ -158,16 +158,7 @@ export const books: Book[] = [
         publishYear: 1970,
         coverImage: "/images/books/folklore_vivant.png", 
         description: "It is always fascinating to see how some groups of people talk about themselves and their traditions. Here is about France of the second part of the 1900 talking about itself and its recent past.",
-        diaryIds: ["diary4"]
-    },
-    {
-        id: "12",
-        title: "Parcours Enchantés",
-        author: "-",
-        publishYear: 1970,
-        coverImage: "/images/books/parcours_enchantes.jpg", 
-        description: "So much space, water and trees spent for silly people burning the world as they touch their expensive grass..",
-        diaryIds: ["diary1"]
+        diaryIds: ["diary3"]
     },
     {
         id: "13",
@@ -176,7 +167,7 @@ export const books: Book[] = [
         publishYear: 1960,
         coverImage: "/images/books/bluff_atroce_nuit.jpg", 
         description: "A graphic novel with photos? The actors are weirdly plastic-y, the stories are about these incredibly conforming, boringly problematic love stories. Issa weird.",
-        diaryIds: ["diary1"]
+        diaryIds: ["diary2"]
     },
     {
         id: "14",
@@ -185,7 +176,7 @@ export const books: Book[] = [
         publishYear: 1989,
         coverImage: "/images/books/cartes_postales_1989.jpg",
         description: "A collection of postcards and ads from the 80s in France.",
-        diaryIds: ["diary1"]
+        diaryIds: ["diary3"]
     }
 ];
 
@@ -204,7 +195,7 @@ export const collages: Collage[] = [
         image: "/images/collages/touch_grass.jpg",
         description: "Algeria, De Gaulle and french folk traditions. Opulence and exploitation. Golf courses and the aftermath of colonisation. They look so obvious when put next to each other and yet are annoyingly and programmatically hidden.   ",
         date: "2024-03-20",
-        bookIds: ["3", "4"]
+        bookIds: ["3", "11","1"]
     },
     {
         id: "3",
@@ -252,7 +243,7 @@ export const collages: Collage[] = [
         image: "/images/collages/carlo_mantello.jpg",
         description: "Power unbalances, a happy Allende. Going through the photos of and articles of the almanac of 1970 reminded me of a time where a lot of the fights we consider lost and unwinnable, still were possible. A genuine interest in constructing the future.",
         date: "2024-04-12",
-        bookIds: ["11"]
+        bookIds: ["9","1",]
     },
     {
         id: "9",
@@ -278,26 +269,26 @@ export const diaryEntries: DiaryEntry[] = [
         date: "2025-01-05",
         title: "Sassetta",
         content: "Nonna Albina's house, she was born there. Almost a century ago now. The huge fireplace where kids could sit and a number of personal and family memories. It is an extension of home, one that persisted as we moved houses. Most of the shops have closed now, people died. In a couple of cardboard boxes 10s of kilos of magazines, theatre plays, journals. They have been there forever. Some are from the early 1900s. All taken. I will spend countless hours going through them now. A mysterious box of stories, prospectives, memories and takes, most of which will sound silly now, who knows how serious they sounded back then.",
-        bookIds: ["6", "5"],
+        bookIds: ["7"],
         location: "Sassetta",
         mood: "Nostalgic"
     },
     {
         id: "diary2",
-        date: "2024-03-20",
-        title: "Underground Revelations",
+        date: "2024-11-20",
+        title: "Hammaus, techno in a van",
         content: "Reading Notes from Underground while actually underground in the metro station. The irony wasn't lost on me. Found an old copy of The Castle in the same secondhand bookstore. The way both books deal with alienation and bureaucracy feels eerily relevant...",
-        bookIds: ["3", "4"],
-        location: "Metro Station",
-        mood: "Introspective"
+        bookIds: ["1","3","2","4","10","13"],
+        location: "Millebrugghe",
+        mood: "Excited"
     },
     {
         id: "diary3",
         date: "2024-12-31",
-        title: "Metamorphosis of Ideas",
-        content: "Revisited The Metamorphosis today, this time alongside The Castle. The way these works interact with each other is fascinating. The themes of transformation and institutional power create an interesting dialogue...",
-        bookIds: ["1", "4"],
-        location: "City Library",
+        title: "Bergue, biscuits beers.",
+        content: "",
+        bookIds: ["9","11","14"],
+        location: "Bergue",
         mood: "Inspired"
     },
     {
@@ -305,7 +296,7 @@ export const diaryEntries: DiaryEntry[] = [
         date: "2024-12-31",
         title: "Roman Treasures",
         content: "Found a treasure trove in a Roman warehouse today - a pack of 'Poliglotta Moderno' from 1905-6, like an ancient Duolingo. A textured map of Cortina D'ampezzo brought back memories of a less-than-pleasant family ski trip. The real gem was a book on Italian folklore - spent the evening reading about Attittadoras, Sardinian euthanasia practitioners, while cooking udons. Also picked up some Socialist Party Cards, a 1936 guide to thermal baths, and a bag of vintage photos. 45€ might have been steep, but these pieces feel priceless...",
-        bookIds: [],
+        bookIds: ["8"],
         location: "Rome Warehouse Shop",
         mood: "Excited"
     },
@@ -325,6 +316,15 @@ export const diaryEntries: DiaryEntry[] = [
         content: "I finally find the market, it took me almost one hour to get there. Walking randomly inside this city that makes absolutely no sense. I met a few elderly playing cards on plastic tables under the highway. The little grass patches filling with green the concrete structures. The area was very quiet, the cars on top of us. Surreal. I get to the second hand market, needless to say I am the only westener, that creates a lot of curiosity",
         bookIds: [],
         location: "Chongqing Second-hand Market",
+        mood: "Curious"
+    },
+    {
+        id: "diary7",
+        date: "2024-04-21", 
+        title: "Ricordi dei miei",
+        content: "",
+        bookIds: ["5"],
+        location: "Third floor, Via della querceta",
         mood: "Curious"
     }
 ];

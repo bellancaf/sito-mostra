@@ -11,27 +11,28 @@
 		"@testing-library/react": "^13.4.0",
 		"@testing-library/user-event": "^13.5.0",
 		"@types/jest": "^29.5.11",
-		"@types/node": "^20.10.4",
 		"@types/react": "^18.2.43",
 		"@types/react-dom": "^18.2.17",
 		"d3": "^7.9.0",
 		"react": "^18.2.0",
 		"react-dom": "^18.2.0",
-		"react-icons": "^5.4.0",
+		"react-icons": "^4.12.0",
 		"react-lazyload": "^3.2.1",
 		"react-loading-skeleton": "^3.5.0",
 		"react-native": "^0.76.5",
 		"react-router-dom": "^6.20.1",
 		"react-scripts": "5.0.1",
-		"sharp": "^0.33.5",
+		"sharp": "^0.34.0",
 		"web-vitals": "^2.1.4",
 		"yet-another-react-lightbox": "^3.21.7"
 	},
 	"scripts": {
-		"start": "react-scripts start",
-		"build": "react-scripts build",
-		"test": "react-scripts test",
-		"eject": "react-scripts eject"
+		"start": "react-app-rewired start",
+		"build": "react-app-rewired build",
+		"test": "react-app-rewired test",
+		"eject": "react-scripts eject",
+		"generate-thumbnails": "ts-node src/scripts/imageProcessor.ts",
+		"test:images": "cross-env NODE_OPTIONS=\"--loader ts-node/esm\" ts-node src/scripts/test-image-processing.ts"
 	},
 	"eslintConfig": {
 		"extends": [
@@ -54,8 +55,11 @@
 	"devDependencies": {
 		"@babel/plugin-proposal-private-property-in-object": "^7.21.11",
 		"@types/d3": "^7.4.3",
+		"@types/node": "^20.17.30",
 		"@types/react-lazyload": "^3.2.3",
 		"@types/react-svg": "^5.0.0",
+		"cross-env": "^7.0.3",
+		"ts-node": "^10.9.2",
 		"typescript": "^4.9.5"
 	}
 }

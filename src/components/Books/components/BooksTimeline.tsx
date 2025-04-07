@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 import { Book } from '../../../types';
 import './BooksTimeline.css';
+import { getImagePaths } from '../../../utils/imageUtils';
 
 interface BooksTimelineProps {
     books: Book[];
@@ -103,10 +104,10 @@ const BooksTimeline: React.FC<BooksTimelineProps> = ({ books }) => {
 
         // Just the image, with clipping path
         const hoverImage = imageContainer.append('image')
-            .attr('width', 80)   // Narrower width
+            .attr('width', 80)
             .attr('height', 120)
             .attr('clip-path', 'url(#hover-image-clip)')
-            .attr('preserveAspectRatio', 'xMidYMid slice'); // Changed to slice to fill the area
+            .attr('preserveAspectRatio', 'xMidYMid slice');
 
         // Create a text group for title and year - positioned closer to image
         const textGroup = hoverContainer.append('g')
@@ -224,7 +225,8 @@ const BooksTimeline: React.FC<BooksTimelineProps> = ({ books }) => {
                             .attr('transform', `translate(${xPos}, ${yPos})`)
                             .style('visibility', 'visible');
                         
-                        hoverImage.attr('href', book.coverImage);
+                        const { thumbnail } = getImagePaths(book.coverImage || '');
+                        hoverImage.attr('href', thumbnail);
                         
                         d3.select(this)
                             .attr('fill', 'var(--color-accent)');

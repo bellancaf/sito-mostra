@@ -24,26 +24,27 @@ const StatementPage: React.FC = () => {
             <div className={`statement-page ${isVisible ? 'visible' : ''}`}>
                 <StatementBackground />
                 <article className="statement-content">
-                    <h1>Statement</h1>
+                    <h1 className="statement-title">Statement</h1>
                     
-                    <section className="statement-main">
-                        <p>I collect whatever catches my eye—maps, bits of text, stray pages, unidentifiable scraps—and allow these fragments to guide me. I also ask people to send me things, whatever they like, to add to my archive. My intent isn't to preserve History, but to rediscover stories that feel human in a way that is playful and open-ended. I place these objects side by side and see what stories emerge. It's the closest I come to that childlike sense of wonder: handling each piece, rearranging it, and letting my intuition reshape its meaning.</p>
-
-                        <p>I don't follow a precise method or seek a single "correct" outcome, nor I plan the narrative before starting a piece. This work exists for me first, a space to explore the playfulness of stories, of history, of people and memory. Once I finish a piece, it's only a starting point—an open dialogue for anyone who sees it. There's no final word or grand statement; each collage holds multiple narratives. I want people to find their own story in there.</p>
-
-                        <p>Mine is not art that seeks to be understood, it is not a barrier between people looking and a correct interpretation of the world. It is a collection of memories, some are spelled out, some are hidden. It is the fuzzy image of a potential story, anyone can and should give their own interpretation. By letting these materials speak on their own, I'm simply offering a point of entry into an evolving conversation.</p>
-
-                        <p>The practice, hinges on the idea that the personal is political and vice versa. I am aware that my activism happens outside of the studio, that art struggles to be a key element of change and that silly collages will not take us to the promised land.</p>
-
-                        <p>However my practice cannot but be influenced by my thoughts my wants and my hopes. The idea of putting together History and personal stories, the research of political material, conflating different struggles and creating these intersectionalists narratives… all of this is political. Is political because I am political. The viewers interpretation is going to be political because we all are political.</p>
+                    <section className="statement-section">
+                        <p className="statement-text">I've been told art statements are important.</p>
+                        <p className="statement-text">I struggle to understand the importance of things.</p>
+                        <p className="statement-text">I struggle to write this because I don't really know what to say about the things I do.</p>
+                        <p className="statement-text">I struggle to understand where to put my focus.</p>
+                        <p className="statement-text">Reflecting on the things I do feels very often a way to justify their existence, to rationalise their purpose and intent.</p>
+                        <p className="statement-text">I struggle to understand how purposeful my actions can be.</p>
+                        <p className="statement-text">And yet, sitting with my unambitious creations, caring for them, and giving them a place to inhabit makes me believe I can do beautiful things, makes believe I can contribute, say things people might resonate with and enjoy the process in the meantime.</p>
+                        <p className="statement-text">So I struggle less, I put this words together here and move on with my day.</p>
                     </section>
 
-                    <section className="archive-section">
-                        <h2>The archive</h2>
-                        
-                        <p>I want to preserve the initial stories, I don't see the material for its aestethic value only, I see it charged with stories, mine of when I got it, the actual context of the item, when was it created/published. I therefore store in the same archive my personal stories of hunting material.</p>
-
-                        <p>I then add the entries of the actual items i collect and the information I have on it. At the end of a piece I then spend a bit of time narrating the stories I see there and creating the connections with all the material I used. The archive is then public allowing everyone to navigate it and have fun running from one place to the other.</p>
+                    <section className="statement-section">
+                        <h2 className="statement-subtitle">Process</h2>
+                        <p className="statement-text">It took me a while to understand that the creative process starts from a need, to deconstructing the silly idea that the art is the product.</p>
+                        <p className="statement-text">The frustrations of not being able to actually create but only having ideas about potential creations was overwhelming at time, so I'd hide my notebook -- embarassed by my lack of talent -- and would keep the ideas between me and myself.</p>
+                        <p className="statement-text">And then I stumbled upon old books, maps, stray pages. It was fun to discover them. I started stacking them up.</p>
+                        <p className="statement-text">With time I started cautiously putting them together, just to discover what my hands would guide me to do.</p>
+                        <p className="statement-text">In those moments the static noise in my head calmed down. I kept going for hours.</p>
+                        <p className="statement-text">Awed by this newfound joy I kept doing it; the artifacts on this site are the outcome of this process.</p>
                     </section>
                 </article>
             </div>

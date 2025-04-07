@@ -4,12 +4,15 @@ import { getBook, getCollagesForBook, getRelatedDiaryEntries } from '../../data'
 import { Collage } from '../../types';
 import './BookPage.css';
 import Breadcrumbs from '../common/Breadcrumbs';
+import { getImagePaths } from '../../utils/imageUtils';
 
 const BookPage: React.FC = () => {
     const { id } = useParams();
     const book = getBook(id || '');
     const [isVisible, setIsVisible] = useState(false);
     
+    const { full: fullImage } = getImagePaths(book?.coverImage || '');
+
     useEffect(() => {
         setIsVisible(true);
     }, []);
@@ -34,7 +37,7 @@ const BookPage: React.FC = () => {
             <div className="book-main">
                 <div className="book-header">
                     <img 
-                        src={book.coverImage} 
+                        src={fullImage}
                         alt={book.title} 
                         className="book-cover-large"
                     />

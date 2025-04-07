@@ -137,18 +137,18 @@ const Homepage: React.FC<HomepageProps> = ({ setIsNavbarVisible, isNavbarVisible
     const [currentLabelType, setCurrentLabelType] = useState<NodeType | null>(null);
     
     // Start the scramble effect after the static transition
-    const scrambledTitle = useScrambleText("My Paper Stories", 50, 40, 1000);
+    const scrambledTitle = useScrambleText("static.noise", 50, 40, 1000);
 
     // First sentence
     const introText = useTypewriter(
-        "As I travel around the world, I collect fragments of stories in paper form.",
+        "Hopping around here and there, I collect fragments of other people's stories.",
         40, // Speed per character
         2500 // Delay = static (1000) + scramble (2000) - 500ms overlap
     );
 
     // Second part starts after first part is complete
     const secondText = useTypewriter(
-        "I hunt for books in second-hand shops and markets. When I find interesting ones, I write diary entries about them, and eventually create collages with their pages.",
+        "books in second-hand shops, photos in flea markets, diaries in old basements. I then try to write diary entries about them, and stitch them together to make collages.",
         40,
         introText.isComplete ? 0 : 999999 // Only start when first part is complete
     );

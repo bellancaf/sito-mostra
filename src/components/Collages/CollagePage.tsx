@@ -4,10 +4,12 @@ import { getCollage, getRelatedBooks } from '../../data';
 import { Book } from '../../types';
 import './CollagePage.css';
 import Breadcrumbs from '../common/Breadcrumbs';
-import { FaExpand } from 'react-icons/fa';
+import { IconContext } from 'react-icons';
+import { MdFullscreen } from 'react-icons/md';
 import Lightbox from 'yet-another-react-lightbox';
 import Zoom from 'yet-another-react-lightbox/plugins/zoom';
 import 'yet-another-react-lightbox/styles.css';
+import { getImagePaths } from '../../utils/imageUtils';
 
 const CollagePage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -15,6 +17,7 @@ const CollagePage: React.FC = () => {
     const [isLightboxOpen, setIsLightboxOpen] = useState(false);
     const collage = getCollage(id || '');
     const relatedBooks = getRelatedBooks(collage?.bookIds || []);
+    const { full: fullImage } = getImagePaths(collage?.image || '');
 
     if (!collage) {
         return <div>Collage not found</div>;
@@ -83,15 +86,17 @@ const CollagePage: React.FC = () => {
 
                 <main className="collage-main">
                     <div className="collage-image-container">
-                        <button 
-                            className="fullscreen-toggle"
-                            onClick={() => setIsLightboxOpen(true)}
-                            aria-label="Open fullscreen"
-                        >
-                            <FaExpand />
-                        </button>
+                        <IconContext.Provider value={{ className: 'fullscreen-icon' }}>
+                            <button 
+                                className="fullscreen-toggle"
+                                onClick={() => setIsLightboxOpen(true)}
+                                aria-label="Open fullscreen"
+                            >
+                                <MdFullscreen />
+                            </button>
+                        </IconContext.Provider>
                         <img 
-                            src={collage.image} 
+                            src={fullImage}
                             alt={collage.title} 
                             className="collage-image"
                         />
@@ -99,7 +104,7 @@ const CollagePage: React.FC = () => {
                         <Lightbox
                             open={isLightboxOpen}
                             close={() => setIsLightboxOpen(false)}
-                            slides={[{ src: collage.image }]}
+                            slides={[{ src: fullImage }]}
                             plugins={[Zoom]}
                             render={{
                                 buttonPrev: () => null,

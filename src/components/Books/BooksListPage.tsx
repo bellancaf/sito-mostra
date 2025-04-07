@@ -1,11 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, Location } from 'react-router-dom';
 import { books, getCollagesForBook } from '../../data';
 import * as d3 from 'd3';
 import './BooksListPage.css';
 import BooksTimeline from './components/BooksTimeline';
-import { FaThLarge, FaProjectDiagram, FaStream } from 'react-icons/fa';
+import { IconContext } from 'react-icons';
 import StaticNoiseBookCard from './components/StaticNoiseBookCard';
+import { getImagePaths } from '../../utils/imageUtils';
+import { MdGridOn, MdAccountTree, MdTimeline } from 'react-icons/md';
 
 interface NodeDatum {
     id: string;
@@ -26,6 +28,16 @@ interface LinkDatum {
 }
 
 type ViewMode = 'grid' | 'network' | 'timeline';
+
+const getLocationString = (location: string | { toString(): string } | undefined): string | undefined => {
+    if (!location) return undefined;
+    if (typeof location === 'string') return location;
+    return location.toString();
+};
+
+const GridIcon = MdGridOn as React.ElementType;
+const NetworkIcon = MdAccountTree as React.ElementType;
+const TimelineIcon = MdTimeline as React.ElementType;
 
 const BooksListPage: React.FC = () => {
     const [viewMode, setViewMode] = useState<ViewMode>('grid');
@@ -113,6 +125,7 @@ const BooksListPage: React.FC = () => {
             if (!ctx) return;
 
             const img = new Image();
+            const { thumbnail } = getImagePaths(node.coverImage || '');
             img.onload = () => {
                 // Draw image
                 ctx.drawImage(img, 0, 0, nodeSize, nodeSize);
@@ -158,7 +171,7 @@ const BooksListPage: React.FC = () => {
                     .attr('height', nodeSize)
                     .attr('preserveAspectRatio', 'xMidYMid slice');
             };
-            img.src = node.coverImage;
+            img.src = thumbnail;
         });
 
         // Create nodes group first but don't draw yet
@@ -232,13 +245,20 @@ const BooksListPage: React.FC = () => {
             if (!ctx) return;
 
             const img = new Image();
-            img.onload = () => {
+            const { thumbnail } = getImagePaths(d.coverImage || '');
+            img.onerror = () => {
+                // Use default pattern if image fails to load
+                drawDefaultPattern(ctx, nodeSize, nodeSize);
+                startAnimation();
+            };
+            
+            function startAnimation() {
                 let lastDrawTime = performance.now();
                 function animate() {
                     if (!ctx) return;
                     
                     const now = performance.now();
-                    if (now - lastDrawTime < 100) { // Match the 100ms delay from grid view
+                    if (now - lastDrawTime < 100) {
                         d.animationFrame = requestAnimationFrame(animate);
                         return;
                     }
@@ -288,8 +308,11 @@ const BooksListPage: React.FC = () => {
                     d.animationFrame = requestAnimationFrame(animate);
                 }
                 animate();
-            };
-            img.src = d.coverImage;
+            }
+
+            // Wait for image to load before starting animation
+            img.onload = startAnimation;
+            img.src = thumbnail;
         })
         .on('mouseleave', function(event, d) {
             if (d.animationFrame) {
@@ -297,7 +320,6 @@ const BooksListPage: React.FC = () => {
                 delete d.animationFrame;
             }
             
-            // Draw one static frame of noise instead of resetting to original image
             const pattern = defs.select(`#cover-${d.id}`);
             const canvas = document.createElement('canvas');
             canvas.width = nodeSize;
@@ -306,11 +328,19 @@ const BooksListPage: React.FC = () => {
             if (!ctx) return;
 
             const img = new Image();
+            const { thumbnail } = getImagePaths(d.coverImage || '');
+            img.onerror = () => {
+                // Use default pattern if image fails to load
+                drawDefaultPattern(ctx, nodeSize, nodeSize);
+                pattern.select('image')
+                    .attr('href', canvas.toDataURL());
+            };
+            
             img.onload = () => {
-                // Draw image
+                // Draw final static frame
                 ctx.drawImage(img, 0, 0, nodeSize, nodeSize);
                 
-                // Add static noise
+                // Add static noise one last time
                 const imageData = ctx.getImageData(0, 0, nodeSize, nodeSize);
                 const data = imageData.data;
 
@@ -346,7 +376,7 @@ const BooksListPage: React.FC = () => {
                 pattern.select('image')
                     .attr('href', canvas.toDataURL());
             };
-            img.src = d.coverImage;
+            img.src = thumbnail;
         });
 
         function dragstarted(event: any) {
@@ -378,56 +408,102 @@ const BooksListPage: React.FC = () => {
         });
     };
 
+    const drawDefaultPattern = (ctx: CanvasRenderingContext2D, width: number, height: number) => {
+        // Fill with a light gray background
+        ctx.fillStyle = '#f0f0f0';
+        ctx.fillRect(0, 0, width, height);
+        
+        // Add some simple geometric pattern
+        ctx.strokeStyle = '#ddd';
+        ctx.lineWidth = 2;
+        
+        // Draw diagonal lines
+        for (let i = 0; i < width + height; i += 20) {
+            ctx.beginPath();
+            ctx.moveTo(i, 0);
+            ctx.lineTo(0, i);
+            ctx.stroke();
+        }
+    };
+
     const drawNoiseOverlay = (
         ctx: CanvasRenderingContext2D, 
         img: HTMLImageElement,
         width: number,
         height: number
     ) => {
-        // Draw the image first
-        ctx.drawImage(img, 0, 0, width, height);
+        return new Promise<void>((resolve) => {
+            img.onerror = () => {
+                // Draw default pattern if image fails to load
+                drawDefaultPattern(ctx, width, height);
+                drawNoiseEffect();
+                resolve();
+            };
 
-        const imageData = ctx.getImageData(0, 0, width, height);
-        const data = imageData.data;
+            if (!img.complete || img.naturalWidth === 0) {
+                img.onload = () => {
+                    drawNoiseEffect(true);
+                    resolve();
+                };
+            } else {
+                drawNoiseEffect(true);
+                resolve();
+            }
 
-        // Draw semi-transparent noise
-        for (let i = 0; i < data.length; i += 4) {
-            const value = Math.random() * 255;
-            data[i + 3] = value * 0.3; // 30% opacity for noise
-        }
-
-        // Add colored dots
-        const primaryColors = [
-            [255, 0, 0],    // Red
-            [255, 255, 0],  // Yellow
-            [0, 0, 255]     // Blue
-        ];
-
-        const numDots = 50;
-        for (let i = 0; i < numDots; i++) {
-            const x = Math.floor(Math.random() * width);
-            const y = Math.floor(Math.random() * height);
-            const color = primaryColors[Math.floor(Math.random() * primaryColors.length)];
-            const pixelIndex = (y * width + x) * 4;
-
-            // Draw a 2x2 pixel dot
-            for (let dy = 0; dy < 2; dy++) {
-                for (let dx = 0; dx < 2; dx++) {
-                    const index = pixelIndex + (dy * width + dx) * 4;
-                    if (index < data.length - 3) {
-                        data[index] = color[0];
-                        data[index + 1] = color[1];
-                        data[index + 2] = color[2];
-                        data[index + 3] = 255;
+            function drawNoiseEffect(hasImage: boolean = false) {
+                if (hasImage) {
+                    // Draw the image first if we have one
+                    try {
+                        ctx.drawImage(img, 0, 0, width, height);
+                    } catch (e) {
+                        // If drawing fails, use default pattern
+                        drawDefaultPattern(ctx, width, height);
                     }
                 }
-            }
-        }
 
-        ctx.putImageData(imageData, 0, 0);
+                const imageData = ctx.getImageData(0, 0, width, height);
+                const data = imageData.data;
+
+                // Draw semi-transparent noise
+                for (let i = 0; i < data.length; i += 4) {
+                    const value = Math.random() * 255;
+                    data[i + 3] = value * 0.3; // 30% opacity for noise
+                }
+
+                // Add colored dots
+                const primaryColors = [
+                    [255, 0, 0],    // Red
+                    [255, 255, 0],  // Yellow
+                    [0, 0, 255]     // Blue
+                ];
+
+                const numDots = 50;
+                for (let i = 0; i < numDots; i++) {
+                    const x = Math.floor(Math.random() * width);
+                    const y = Math.floor(Math.random() * height);
+                    const color = primaryColors[Math.floor(Math.random() * primaryColors.length)];
+                    const pixelIndex = (y * width + x) * 4;
+
+                    // Draw a 2x2 pixel dot
+                    for (let dy = 0; dy < 2; dy++) {
+                        for (let dx = 0; dx < 2; dx++) {
+                            const index = pixelIndex + (dy * width + dx) * 4;
+                            if (index < data.length - 3) {
+                                data[index] = color[0];
+                                data[index + 1] = color[1];
+                                data[index + 2] = color[2];
+                                data[index + 3] = 255;
+                            }
+                        }
+                    }
+                }
+
+                ctx.putImageData(imageData, 0, 0);
+            }
+        });
     };
 
-    const handleMouseEnter = (bookId: string) => {
+    const handleMouseEnter = async (bookId: string) => {
         isHovering.current[bookId] = true;
         const canvas = canvasRefs.current[bookId];
         if (!canvas) return;
@@ -436,15 +512,14 @@ const BooksListPage: React.FC = () => {
         if (!ctx) return;
 
         const img = new Image();
-        img.src = books.find(b => b.id === bookId)?.coverImage || '';
-        img.onload = () => {
-            const animate = () => {
-                if (!isHovering.current[bookId]) return;
-                drawNoiseOverlay(ctx, img, canvas.width, canvas.height);
-                animationFrames.current[bookId] = requestAnimationFrame(animate);
-            };
-            animate();
+        const { thumbnail } = getImagePaths(books.find(b => b.id === bookId)?.coverImage || '');
+
+        const animate = async () => {
+            if (!isHovering.current[bookId]) return;
+            await drawNoiseOverlay(ctx, img, canvas.width, canvas.height);
+            animationFrames.current[bookId] = requestAnimationFrame(animate);
         };
+        animate();
     };
 
     const handleMouseLeave = (bookId: string) => {
@@ -460,73 +535,79 @@ const BooksListPage: React.FC = () => {
         if (!ctx) return;
 
         const img = new Image();
-        img.src = books.find(b => b.id === bookId)?.coverImage || '';
+        const { thumbnail } = getImagePaths(books.find(b => b.id === bookId)?.coverImage || '');
+        img.src = thumbnail;
         img.onload = () => {
             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
         };
     };
 
     return (
-        <div className="books-container">
-            <div className="books-main-content">
-                <div className="books-header">
-                    <div className="title-section">
-                        <h1 className="books-title">Books</h1>
-                        <p className="books-description">
-                            Here you can find my books. You can see them in a{' '}
-                            <span 
-                                className={`view-option ${viewMode === 'grid' ? 'active' : ''}`}
-                                onClick={() => setViewMode('grid')}
-                            >
-                                <FaThLarge className="view-icon" />
-                                <span className="view-label">grid</span>
-                            </span>
-                            {', '}
-                            <span 
-                                className={`view-option ${viewMode === 'network' ? 'active' : ''}`}
-                                onClick={() => setViewMode('network')}
-                            >
-                                <FaProjectDiagram className="view-icon" />
-                                <span className="view-label">network</span>
-                            </span>
-                            {' '}or{' '}
-                            <span 
-                                className={`view-option ${viewMode === 'timeline' ? 'active' : ''}`}
-                                onClick={() => setViewMode('timeline')}
-                            >
-                                <FaStream className="view-icon" />
-                                <span className="view-label">timeline</span>
-                            </span>
-                            {' '}view.
-                        </p>
+        <IconContext.Provider value={{ className: 'view-icon' }}>
+            <div className="books-container">
+                <div className="books-main-content">
+                    <div className="books-header">
+                        <div className="title-section">
+                            <h1 className="books-title">Books</h1>
+                            <p className="books-description">
+                                Here you can find my books. You can see them in a{' '}
+                                <span 
+                                    className={`view-option ${viewMode === 'grid' ? 'active' : ''}`}
+                                    onClick={() => setViewMode('grid')}
+                                >
+                                    <GridIcon />
+                                    <span className="view-label">grid</span>
+                                </span>
+                                {', '}
+                                <span 
+                                    className={`view-option ${viewMode === 'network' ? 'active' : ''}`}
+                                    onClick={() => setViewMode('network')}
+                                >
+                                    <NetworkIcon />
+                                    <span className="view-label">network</span>
+                                </span>
+                                {' '}or{' '}
+                                <span 
+                                    className={`view-option ${viewMode === 'timeline' ? 'active' : ''}`}
+                                    onClick={() => setViewMode('timeline')}
+                                >
+                                    <TimelineIcon />
+                                    <span className="view-label">timeline</span>
+                                </span>
+                                {' '}view.
+                            </p>
+                        </div>
                     </div>
-                </div>
 
-                {viewMode === 'grid' && (
-                    <div className="books-grid">
-                        {books.map(book => (
-                            <StaticNoiseBookCard
-                                key={book.id}
-                                id={book.id}
-                                title={book.title}
-                                author={book.author}
-                                publishYear={book.publishYear}
-                                coverImage={book.coverImage}
-                                location={book.location}
-                            />
-                        ))}
-                    </div>
-                )}
-                
-                {viewMode === 'network' && (
-                    <svg ref={networkRef} className="books-network"></svg>
-                )}
-                
-                {viewMode === 'timeline' && (
-                    <BooksTimeline books={books} />
-                )}
+                    {viewMode === 'grid' && (
+                        <div className="books-grid">
+                            {books.map(book => {
+                                const { thumbnail } = getImagePaths(book.coverImage || '');
+                                return (
+                                    <StaticNoiseBookCard
+                                        key={book.id}
+                                        id={book.id}
+                                        title={book.title}
+                                        author={book.author}
+                                        publishYear={book.publishYear}
+                                        coverImage={thumbnail}
+                                        location={getLocationString(book.location)}
+                                    />
+                                );
+                            })}
+                        </div>
+                    )}
+                    
+                    {viewMode === 'network' && (
+                        <svg ref={networkRef} className="books-network"></svg>
+                    )}
+                    
+                    {viewMode === 'timeline' && (
+                        <BooksTimeline books={books} />
+                    )}
+                </div>
             </div>
-        </div>
+        </IconContext.Provider>
     );
 };
 

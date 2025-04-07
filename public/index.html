@@ -9,9 +9,19 @@
       content="Sisyphos - A personal archive"
     />
     <title>static-noise</title>
+    <script>
+      console.log('HTML loaded');
+      window.onerror = function(msg, url, lineNo, columnNo, error) {
+        console.error('Window Error:', msg, url, lineNo, columnNo, error);
+        return false;
+      };
+    </script>
   </head>
   <body>
     <noscript>You need to enable JavaScript to see this wonderful website.</noscript>
     <div id="root"></div>
+    <script>
+      console.log('Body loaded, root element:', document.getElementById('root'));
+    </script>
   </body>
 </html>

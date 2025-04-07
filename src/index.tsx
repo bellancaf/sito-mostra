@@ -4,16 +4,29 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { SpeedInsights } from "@vercel/speed-insights/react";
 
+// Add global error handlers
+window.onerror = (message, source, lineno, colno, error) => {
+  console.error('Global error:', { message, source, lineno, colno, error });
+  return false;
+};
+
+window.onunhandledrejection = (event) => {
+  console.error('Unhandled promise rejection:', event.reason);
+};
+
 console.log('Starting app initialization...');
 
-const rootElement = document.getElementById('root');
-console.log('Root element:', rootElement);
+try {
+  const rootElement = document.getElementById('root');
+  console.log('Root element:', rootElement);
 
-if (!rootElement) {
-  console.error('Failed to find root element!');
-} else {
+  if (!rootElement) {
+    throw new Error('Failed to find root element!');
+  }
+
   const root = ReactDOM.createRoot(rootElement);
-  
+  console.log('Root created');
+
   root.render(
     <React.StrictMode>
       <App />
@@ -22,6 +35,9 @@ if (!rootElement) {
   );
   
   console.log('App rendered successfully');
+} catch (error) {
+  console.error('Error during initialization:', error);
 }
 
-reportWebVitals(console.log); // This will log performance metrics 
+// Log performance metrics
+reportWebVitals(console.log); 

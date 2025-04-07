@@ -10,9 +10,11 @@ interface StaticNoiseBookCardProps {
     publishYear: number;
     coverImage?: string;
     location?: string;
+    simplified?: boolean;
 }
 
 const StaticNoiseBookCard: React.FC<StaticNoiseBookCardProps> = ({
+    simplified = false,
     id,
     title,
     author,
@@ -170,6 +172,22 @@ const StaticNoiseBookCard: React.FC<StaticNoiseBookCardProps> = ({
             }
         };
     }, [coverImage]);
+
+    if (simplified) {
+        return (
+            <Link to={`/books/${id}`} className="book-card simplified">
+                <img
+                    src={thumbnail}
+                    alt={title}
+                    className="book-cover"
+                />
+                <div className="book-info">
+                    <h3>{title}</h3>
+                    <p>{author}</p>
+                </div>
+            </Link>
+        );
+    }
 
     return (
         <Link to={`/books/${id}`} className="book-card">

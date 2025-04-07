@@ -83,4 +83,39 @@
 
 .static-noise-collage-card.force-hover .card-image {
     opacity: 0;
+}
+
+.collage-card.simplified {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: transform 0.2s ease;
+}
+
+.collage-card.simplified:active {
+    transform: scale(0.98);
+}
+
+.collage-card.simplified .collage-thumbnail {
+    width: 100%;
+    aspect-ratio: 3/2;
+    object-fit: cover;
+}
+
+.collage-card.simplified .collage-info {
+    padding: 0.75rem;
+}
+
+.collage-card.simplified h3 {
+    font-size: 0.9rem;
+    margin: 0;
+    color: var(--color-text);
+}
+
+.collage-card.simplified p {
+    font-size: 0.8rem;
+    margin: 0.2rem 0 0;
+    color: var(--color-gray-600);
 } 

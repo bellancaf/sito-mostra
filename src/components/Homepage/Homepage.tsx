@@ -330,14 +330,31 @@ const Homepage: React.FC<HomepageProps> = ({ setIsNavbarVisible, isNavbarVisible
 
         const container = svg.append('g');
 
-        // Add zoom behavior
+        // Update the zoom behavior
         const zoom = d3.zoom<SVGSVGElement, unknown>()
             .scaleExtent([0.1, 4])
             .on('zoom', (event) => {
                 container.attr('transform', event.transform);
+            })
+            .filter(event => {
+                // Allow touch events and left-click drag
+                if (event.type === 'mousedown') return event.button === 0;
+                if (event.type === 'touchstart') return true;
+                
+                // Allow wheel events only if not touch device
+                if (event.type === 'wheel') {
+                    event.preventDefault();
+                    return !('ontouchstart' in window);
+                }
+                return true;
             });
 
-        svg.call(zoom);
+        // Apply zoom with initial transform
+        svg.call(zoom)
+           .call(zoom.transform, d3.zoomIdentity);
+
+        // Disable double-click zoom
+        svg.on("dblclick.zoom", null);
 
         // Add links
         const link = container.append('g')

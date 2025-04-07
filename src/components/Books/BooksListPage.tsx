@@ -8,6 +8,8 @@ import { IconContext } from 'react-icons';
 import StaticNoiseBookCard from './components/StaticNoiseBookCard';
 import { getImagePaths } from '../../utils/imageUtils';
 import { MdGridOn, MdAccountTree, MdTimeline } from 'react-icons/md';
+import useMediaQuery from '../../hooks/useMediaQuery';
+import MobileNotice from '../common/MobileNotice';
 
 interface NodeDatum {
     id: string;
@@ -46,25 +48,50 @@ const BooksListPage: React.FC = () => {
     const animationFrames = useRef<{ [key: string]: number }>({});
     const isHovering = useRef<{ [key: string]: boolean }>({});
     const navigate = useNavigate();
+    const isMobile = useMediaQuery('(max-width: 768px)');
 
     useEffect(() => {
-        if (viewMode === 'network') {
+        if (viewMode === 'network' && !isMobile) {
             createNetworkVisualization();
         }
-    }, [viewMode]);
+
+        return () => {
+            // Cleanup D3 event listeners
+            if (networkRef.current) {
+                d3.select(networkRef.current).on('.zoom', null);
+            }
+        };
+    }, [viewMode, isMobile]);
+
+    // Force grid view on mobile
+    useEffect(() => {
+        if (isMobile && viewMode !== 'grid') {
+            setViewMode('grid');
+        }
+    }, [isMobile]);
 
     const createNetworkVisualization = () => {
-        if (!networkRef.current) return;
+        if (!networkRef.current || isMobile) return; // Don't create network on mobile
 
         const width = networkRef.current.clientWidth || 1200;
         const height = 600;
         const nodeSize = 100;
 
-        // Add zoom behavior
+        // Add zoom behavior with interrupt check
         const zoom = d3.zoom<SVGSVGElement, unknown>()
             .scaleExtent([0.2, 3])
             .on('zoom', (event) => {
+                if (!event.sourceEvent) return; // Ignore zoom events without source event
+                if (event.sourceEvent.type === 'wheel' && event.sourceEvent.ctrlKey) {
+                    event.preventDefault(); // Prevent browser zoom on Ctrl+Wheel
+                }
                 container.attr('transform', event.transform);
+            })
+            .filter(event => {
+                // Disable zoom on mobile devices
+                if (isMobile) return false;
+                // Allow only mouse wheel and drag events
+                return !event.ctrlKey && !event.button && event.type !== 'dblclick';
             });
 
         const svg = d3.select(networkRef.current)
@@ -73,6 +100,7 @@ const BooksListPage: React.FC = () => {
             .call(zoom)
             .on("dblclick.zoom", null);
 
+        // Clear any existing content
         svg.selectAll("*").remove();
 
         // Create defs first for patterns
@@ -543,71 +571,80 @@ const BooksListPage: React.FC = () => {
     };
 
     return (
-        <IconContext.Provider value={{ className: 'view-icon' }}>
-            <div className="books-container">
-                <div className="books-main-content">
-                    <div className="books-header">
-                        <div className="title-section">
-                            <h1 className="books-title">Books</h1>
-                            <p className="books-description">
-                                Here you can find my books. You can see them in a{' '}
-                                <span 
-                                    className={`view-option ${viewMode === 'grid' ? 'active' : ''}`}
-                                    onClick={() => setViewMode('grid')}
-                                >
-                                    <GridIcon />
-                                    <span className="view-label">grid</span>
-                                </span>
-                                {', '}
-                                <span 
-                                    className={`view-option ${viewMode === 'network' ? 'active' : ''}`}
-                                    onClick={() => setViewMode('network')}
-                                >
-                                    <NetworkIcon />
-                                    <span className="view-label">network</span>
-                                </span>
-                                {' '}or{' '}
-                                <span 
-                                    className={`view-option ${viewMode === 'timeline' ? 'active' : ''}`}
-                                    onClick={() => setViewMode('timeline')}
-                                >
-                                    <TimelineIcon />
-                                    <span className="view-label">timeline</span>
-                                </span>
-                                {' '}view.
-                            </p>
+        <>
+            {isMobile && <MobileNotice />}
+            <IconContext.Provider value={{ className: 'view-icon' }}>
+                <div className="books-container">
+                    <div className="books-main-content">
+                        <div className="books-header">
+                            <div className="title-section">
+                                <h1 className="books-title">Books</h1>
+                                {!isMobile ? (
+                                    <p className="books-description">
+                                        Here you can find my books. You can see them in a{' '}
+                                        <span 
+                                            className={`view-option ${viewMode === 'grid' ? 'active' : ''}`}
+                                            onClick={() => setViewMode('grid')}
+                                        >
+                                            <GridIcon />
+                                            <span className="view-label">grid</span>
+                                        </span>
+                                        {', '}
+                                        <span 
+                                            className={`view-option ${viewMode === 'network' ? 'active' : ''}`}
+                                            onClick={() => setViewMode('network')}
+                                        >
+                                            <NetworkIcon />
+                                            <span className="view-label">network</span>
+                                        </span>
+                                        {' '}or{' '}
+                                        <span 
+                                            className={`view-option ${viewMode === 'timeline' ? 'active' : ''}`}
+                                            onClick={() => setViewMode('timeline')}
+                                        >
+                                            <TimelineIcon />
+                                            <span className="view-label">timeline</span>
+                                        </span>
+                                        {' '}view.
+                                    </p>
+                                ) : (
+                                    <p className="books-description-mobile">
+                                        Browse through my collection of books.
+                                    </p>
+                                )}
+                            </div>
                         </div>
-                    </div>
 
-                    {viewMode === 'grid' && (
-                        <div className="books-grid">
-                            {books.map(book => {
-                                const { thumbnail } = getImagePaths(book.coverImage || '');
-                                return (
-                                    <StaticNoiseBookCard
-                                        key={book.id}
-                                        id={book.id}
-                                        title={book.title}
-                                        author={book.author}
-                                        publishYear={book.publishYear}
-                                        coverImage={thumbnail}
-                                        location={getLocationString(book.location)}
-                                    />
-                                );
-                            })}
-                        </div>
-                    )}
-                    
-                    {viewMode === 'network' && (
-                        <svg ref={networkRef} className="books-network"></svg>
-                    )}
-                    
-                    {viewMode === 'timeline' && (
-                        <BooksTimeline books={books} />
-                    )}
+                        {viewMode === 'grid' && (
+                            <div className="books-grid">
+                                {books.map(book => {
+                                    const { thumbnail } = getImagePaths(book.coverImage || '');
+                                    return (
+                                        <StaticNoiseBookCard
+                                            key={book.id}
+                                            id={book.id}
+                                            title={book.title}
+                                            author={book.author}
+                                            publishYear={book.publishYear}
+                                            coverImage={thumbnail}
+                                            location={getLocationString(book.location)}
+                                        />
+                                    );
+                                })}
+                            </div>
+                        )}
+                        
+                        {viewMode === 'network' && (
+                            <svg ref={networkRef} className="books-network"></svg>
+                        )}
+                        
+                        {viewMode === 'timeline' && (
+                            <BooksTimeline books={books} />
+                        )}
+                    </div>
                 </div>
-            </div>
-        </IconContext.Provider>
+            </IconContext.Provider>
+        </>
     );
 };
 

@@ -3,23 +3,28 @@ import * as d3 from 'd3';
 import { Book } from '../../../types';
 import './BooksTimeline.css';
 import { getImagePaths } from '../../../utils/imageUtils';
+import useMediaQuery from '../../../hooks/useMediaQuery';
 
 interface BooksTimelineProps {
     books: Book[];
 }
 
 const BooksTimeline: React.FC<BooksTimelineProps> = ({ books }) => {
-    const timelineRef = useRef<SVGSVGElement | null>(null);
+    const timelineRef = useRef<SVGSVGElement>(null);
+    const isMobile = useMediaQuery('(max-width: 768px)');
 
     useEffect(() => {
         if (!timelineRef.current) return;
 
+        // Adjust dimensions for mobile
+        const width = timelineRef.current.clientWidth;
+        const height = isMobile ? 400 : 600; // Shorter on mobile
+        const margin = isMobile ? 
+            { top: 20, right: 20, bottom: 20, left: 20 } : 
+            { top: 40, right: 40, bottom: 40, left: 40 };
+
         // Clear any existing content
         d3.select(timelineRef.current).selectAll("*").remove();
-
-        const margin = { top: 40, right: 40, bottom: 40, left: 60 };
-        const width = timelineRef.current.clientWidth;
-        const height = Math.max(600, books.length * 30); // Reduced height since we're using smaller squares
 
         const squareSize = 12; // Smaller square size
         const squareGap = 3; // Smaller gap between squares
@@ -239,14 +244,32 @@ const BooksTimeline: React.FC<BooksTimelineProps> = ({ books }) => {
                     .on('click', () => {
                         window.location.href = `/books/${book.id}`;
                     });
+
+                // Adjust text and interaction for mobile
+                if (isMobile) {
+                    // Simplify hover interaction
+                    square
+                        .on('click', function(event) {
+                            // Show a simpler tooltip
+                            const tooltip = d3.select('.tooltip');
+                            tooltip.html(`
+                                <strong>${book.title}</strong><br>
+                                ${book.publishYear}
+                            `);
+                            tooltip.style('visibility', 'visible');
+                        });
+                }
             });
         });
 
-    }, [books]);
+    }, [books, isMobile]);
 
     return (
-        <div className="books-timeline">
-            <svg ref={timelineRef}></svg>
+        <div className="timeline-container">
+            <svg 
+                ref={timelineRef} 
+                className={`books-timeline ${isMobile ? 'mobile' : ''}`}
+            ></svg>
         </div>
     );
 };

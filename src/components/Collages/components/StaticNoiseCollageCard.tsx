@@ -61,7 +61,7 @@ interface StaticNoiseCollageCardProps {
     title: string;
     date: string;
     image: string;
-    forceHover?: boolean;
+    simplified?: boolean;
 }
 
 const StaticNoiseCollageCard: React.FC<StaticNoiseCollageCardProps> = ({
@@ -69,21 +69,43 @@ const StaticNoiseCollageCard: React.FC<StaticNoiseCollageCardProps> = ({
     title,
     date,
     image,
-    forceHover = false
+    simplified = false
 }) => {
+    // Move all hooks to the top level - they will always be called
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const animationFrameRef = useRef<number>();
     const lastDrawTime = useRef<number>(0);
 
     useEffect(() => {
-        if (forceHover) {
-            handleMouseEnter();
-        } else {
-            handleMouseLeave();
-        }
-    }, [forceHover]);
+        // Only run the animation if not simplified
+        if (simplified || !canvasRef.current) return;
+
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        const selectedColor = colorCombos[Math.floor(Math.random() * colorCombos.length)];
+
+        animateStaticNoise(
+            ctx, 
+            canvas.width, 
+            canvas.height, 
+            lastDrawTime, 
+            animationFrameRef, 
+            selectedColor
+        );
+
+        // Cleanup function
+        return () => {
+            if (animationFrameRef.current) {
+                cancelAnimationFrame(animationFrameRef.current);
+            }
+        };
+    }, [simplified]); // Add simplified to dependencies
 
     const handleMouseEnter = () => {
+        if (simplified) return;
+        
         const canvas = canvasRef.current;
         if (!canvas) return;
 
@@ -103,6 +125,8 @@ const StaticNoiseCollageCard: React.FC<StaticNoiseCollageCardProps> = ({
     };
 
     const handleMouseLeave = () => {
+        if (simplified) return;
+
         if (animationFrameRef.current) {
             cancelAnimationFrame(animationFrameRef.current);
         }
@@ -116,10 +140,28 @@ const StaticNoiseCollageCard: React.FC<StaticNoiseCollageCardProps> = ({
         ctx.clearRect(0, 0, canvas.width, canvas.height);
     };
 
+    // Render simplified version
+    if (simplified) {
+        return (
+            <Link to={`/collages/${id}`} className="collage-card simplified">
+                <img
+                    src={image}
+                    alt={title}
+                    className="collage-thumbnail"
+                />
+                <div className="collage-info">
+                    <h3>{title}</h3>
+                    <p>{date}</p>
+                </div>
+            </Link>
+        );
+    }
+
+    // Render full version
     return (
         <Link 
             to={`/collages/${id}`} 
-            className={`static-noise-collage-card ${forceHover ? 'force-hover' : ''}`}
+            className="static-noise-collage-card"
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
         >

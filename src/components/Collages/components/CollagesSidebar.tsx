@@ -12,33 +12,29 @@ interface CollageData {
 }
 
 interface CollagesSidebarProps {
-    collage: CollageData | null;
-    onClose: () => void;
+    selectedYear: number | null;
+    onYearSelect: (year: number | null) => void;
 }
 
-const CollagesSidebar: React.FC<CollagesSidebarProps> = ({ collage, onClose }) => {
-    if (!collage) return null;
+const CollagesSidebar: React.FC<CollagesSidebarProps> = ({ selectedYear, onYearSelect }) => {
+    if (!selectedYear) return null;
 
     return (
-        <div className={`collages-sidebar ${collage ? 'open' : ''}`}>
-            <button className="close-button" onClick={onClose}>×</button>
+        <div className={`collages-sidebar ${selectedYear ? 'open' : ''}`}>
+            <button className="close-button" onClick={() => onYearSelect(null)}>×</button>
             
             <div className="sidebar-content">
-                <h2>{collage.title}</h2>
-                <p className="date">{collage.date}</p>
+                <h2>{selectedYear} Collages</h2>
+                <p className="date">{selectedYear} Collages</p>
                 
                 <img 
-                    src={collage.image} 
-                    alt={collage.title} 
+                    src={`https://via.placeholder.com/150?text=${selectedYear}`} 
+                    alt={selectedYear.toString()} 
                     className="sidebar-image"
                 />
                 
-                {collage.description && (
-                    <p className="description">{collage.description}</p>
-                )}
-                
                 <Link 
-                    to={`/collages/${collage.id}`} 
+                    to={`/collages/${selectedYear}`} 
                     className="view-more-button"
                 >
                     discover more

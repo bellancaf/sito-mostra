@@ -12,10 +12,17 @@ const BookPage: React.FC = () => {
     const [isVisible, setIsVisible] = useState(false);
     
     const { full: fullImage } = getImagePaths(book?.coverImage || '');
+    const [imageError, setImageError] = useState(false);
 
     useEffect(() => {
         setIsVisible(true);
     }, []);
+
+    // Add fallback image handling
+    const handleImageError = () => {
+        setImageError(true);
+        console.error(`Failed to load image: ${fullImage}`);
+    };
 
     if (!book) return <div className="not-found">Book not found</div>;
     
@@ -40,6 +47,7 @@ const BookPage: React.FC = () => {
                         src={fullImage}
                         alt={book.title} 
                         className="book-cover-large"
+                        onError={handleImageError}
                     />
                     <div className="book-info">
                         <h1>{book.title}</h1>

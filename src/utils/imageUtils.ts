@@ -1,57 +1,34 @@
 export const getImagePaths = (imagePath: string) => {
-    if (!imagePath) return { full: '', thumbnail: '', webp: '', thumbnailWebp: '' };
+    if (!imagePath) return { thumbnail: '', full: '' };
 
-    // For production, use CDN URLs
-    if (process.env.NODE_ENV === 'production') {
-        const cdnBase = process.env.REACT_APP_CDN_URL;
-        return {
-            full: `${cdnBase}/images/${imagePath}`,
-            thumbnail: `${cdnBase}/thumbnails/${imagePath}`,
-            webp: `${cdnBase}/images/${imagePath.replace(/\.[^.]+$/, '.webp')}`,
-            thumbnailWebp: `${cdnBase}/thumbnails/${imagePath.replace(/\.[^.]+$/, '.webp')}`
-        };
-    }
+    // For production, assume images are in the public directory
+    const baseUrl = process.env.NODE_ENV === 'production' 
+        ? process.env.PUBLIC_URL || ''
+        : '';
 
-    // For development, use local paths
-    // Extract file info
-    const pathInfo = imagePath.match(/^(.+)\/([^/]+)\.([^.]+)$/);
-    if (!pathInfo) return { full: imagePath, thumbnail: '', webp: '', thumbnailWebp: '' };
+    // Remove any leading slash to ensure proper path joining
+    const cleanPath = imagePath.startsWith('/') ? imagePath.slice(1) : imagePath;
 
-    const [, basePath, fileName, ext] = pathInfo;
-    const category = basePath.match(/\/images\/(books|collages)\//)?.[1] || '';
-
-    // Generate all possible paths
     const paths = {
-        full: imagePath,
-        thumbnail: imagePath.replace(
-            `/images/${category}/`,
-            `/images/thumbnails/${category}/`
-        ),
-        webp: `${basePath}/${fileName}.webp`,
-        thumbnailWebp: imagePath.replace(
-            `/images/${category}/`,
-            `/images/thumbnails/${category}/`
-        ).replace(`.${ext}`, '.webp')
+        thumbnail: `${baseUrl}/images/thumbnails/${cleanPath}`,
+        full: `${baseUrl}/images/${cleanPath}`
     };
 
-    // Log in development
-    if (process.env.NODE_ENV === 'development') {
-        console.log(`Image paths generated for ${fileName}:`, paths);
-    }
+    // Add debug logging
+    console.log('Image Paths:', {
+        originalPath: imagePath,
+        baseUrl,
+        cleanPath,
+        paths,
+        env: process.env.NODE_ENV,
+        publicUrl: process.env.PUBLIC_URL
+    });
 
     return paths;
 };
 
-// Helper to get the best available image format
+// Simplified getBestImagePath that doesn't rely on WebP
 export const getBestImagePath = (paths: ReturnType<typeof getImagePaths>, isThumb = false) => {
-    // Check if browser supports WebP
-    const supportsWebP = document.createElement('canvas')
-        .toDataURL('image/webp')
-        .indexOf('data:image/webp') === 0;
-
-    if (supportsWebP) {
-        return isThumb ? paths.thumbnailWebp : paths.webp;
-    }
     return isThumb ? paths.thumbnail : paths.full;
 };
 

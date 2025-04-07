@@ -212,6 +212,7 @@ const Homepage: React.FC<HomepageProps> = ({ setIsNavbarVisible, isNavbarVisible
     };
 
     useEffect(() => {
+        console.log('Homepage mounted');
         // Make the content ready but invisible immediately
         setIsVisible(true);
         

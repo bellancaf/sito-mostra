@@ -1,33 +1,27 @@
 export const getImagePaths = (imagePath: string) => {
     if (!imagePath) return { thumbnail: '', full: '' };
 
-    // For production, assume images are in the public directory
-    const baseUrl = process.env.NODE_ENV === 'production' 
-        ? process.env.PUBLIC_URL || ''
-        : '';
-
-    // Remove any leading slash to ensure proper path joining
+    // Remove any leading slash and ensure clean path
     const cleanPath = imagePath.startsWith('/') ? imagePath.slice(1) : imagePath;
 
+    // In production, images should be served from the root
     const paths = {
-        thumbnail: `${baseUrl}/images/thumbnails/${cleanPath}`,
-        full: `${baseUrl}/images/${cleanPath}`
+        thumbnail: `/images/thumbnails/${cleanPath}`,
+        full: `/images/${cleanPath}`
     };
 
-    // Add debug logging
+    // Debug logging
     console.log('Image Paths:', {
         originalPath: imagePath,
-        baseUrl,
         cleanPath,
         paths,
-        env: process.env.NODE_ENV,
-        publicUrl: process.env.PUBLIC_URL
+        env: process.env.NODE_ENV
     });
 
     return paths;
 };
 
-// Simplified getBestImagePath that doesn't rely on WebP
+// Simplified getBestImagePath
 export const getBestImagePath = (paths: ReturnType<typeof getImagePaths>, isThumb = false) => {
     return isThumb ? paths.thumbnail : paths.full;
 };

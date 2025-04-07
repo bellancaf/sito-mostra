@@ -1,14 +1,26 @@
 {
   "version": 2,
   "routes": [
-    { "handle": "filesystem" },
-    { "src": "/.*", "dest": "/index.html" }
+    {
+      "src": "/static/(.*)",
+      "dest": "/static/$1"
+    },
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
   ],
   "builds": [
     {
       "src": "package.json",
       "use": "@vercel/static-build",
-      "config": { "zeroConfig": true }
+      "config": { 
+        "zeroConfig": true,
+        "distDir": "build"
+      }
     }
   ]
 } 

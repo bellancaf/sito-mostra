@@ -28,7 +28,7 @@
 	},
 	"scripts": {
 		"start": "react-scripts start",
-		"build": "react-scripts build && npm run copy-images",
+		"build": "GENERATE_SOURCEMAP=false react-scripts build && npm run copy-images",
 		"test": "react-scripts test",
 		"eject": "react-scripts eject",
 		"generate-thumbnails": "ts-node src/scripts/imageProcessor.ts",

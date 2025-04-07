@@ -7,6 +7,7 @@ import { SpeedInsights } from "@vercel/speed-insights/react";
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
+//how is itttt?
 
 root.render(
   <React.StrictMode>

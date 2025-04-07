@@ -23,11 +23,22 @@ const App: React.FC = () => {
     const [isNavbarVisible, setIsNavbarVisible] = React.useState(true);
 
     React.useEffect(() => {
-        console.log('App mounted');
-        // Log any potential errors
-        window.onerror = function(msg, url, lineNo, columnNo, error) {
-            console.log('Window Error: ', {msg, url, lineNo, columnNo, error});
+        console.log('App component mounted');
+        
+        // Add detailed error logging
+        window.onerror = (message, source, lineno, colno, error) => {
+            console.error('Global error:', {
+                message,
+                source,
+                lineno,
+                colno,
+                error
+            });
             return false;
+        };
+
+        window.onunhandledrejection = (event) => {
+            console.error('Unhandled promise rejection:', event.reason);
         };
     }, []);
 
@@ -84,6 +95,10 @@ const App: React.FC = () => {
                                 <Route 
                                     path="/static-noise" 
                                     element={withPageLayout(StaticNoisePage)} 
+                                />
+                                <Route 
+                                    path="/test" 
+                                    element={<div style={{padding: '20px', color: 'white'}}>Test Route Working</div>} 
                                 />
                             </Routes>
                         </main>

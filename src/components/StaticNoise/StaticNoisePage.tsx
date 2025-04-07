@@ -41,7 +41,7 @@ const StaticNoisePage: React.FC = () => {
 
         // Load background image
         const img = new Image();
-        img.src = `${process.env.PUBLIC_URL}/images/books/revue_mondiale.jpg`;
+        img.src = '/images/books/revue_mondiale.jpg';
         img.onload = () => {
             // Draw the plain image on all canvases
             imageCtx.drawImage(img, 0, 0, imageCanvas.width, imageCanvas.height);

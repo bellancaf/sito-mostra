@@ -24,7 +24,12 @@ const App: React.FC = () => {
 
     React.useEffect(() => {
         console.log('App component mounted');
+        console.log('Current theme:', document.body.className);
+        console.log('NavBar visibility:', isNavbarVisible);
         
+        // Force light theme for debugging
+        document.body.className = 'light-theme';
+
         // Add detailed error logging
         window.onerror = (message, source, lineno, colno, error) => {
             console.error('Global error:', {
@@ -40,7 +45,7 @@ const App: React.FC = () => {
         window.onunhandledrejection = (event) => {
             console.error('Unhandled promise rejection:', event.reason);
         };
-    }, []);
+    }, [isNavbarVisible]);
 
     // Wrap component with PageLayout for top-level routes
     const withPageLayout = (Component: React.FC<any>, props: any = {}) => (
@@ -53,9 +58,12 @@ const App: React.FC = () => {
         <ErrorBoundary>
             <ThemeProvider>
                 <Router>
-                    <div className="app">
+                    <div className="app" style={{ background: 'white', color: 'black' }}>
                         <NavBar isNavbarVisible={isNavbarVisible} />
-                        <main>
+                        <main style={{ background: 'white', color: 'black' }}>
+                            <div style={{ padding: '20px', background: 'yellow', color: 'black' }}>
+                                Debug: App is rendering
+                            </div>
                             <Routes>
                                 <Route 
                                     path="/" 

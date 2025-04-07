@@ -1,0 +1,29 @@
+body {
+  margin: 0;
+  padding: 0;
+  background: white;
+  color: black;
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Debug styles to make sure content is visible */
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: white;
+  color: black;
+}
+
+main {
+  flex: 1;
+  padding: 20px;
+  background: white;
+  color: black;
+} 

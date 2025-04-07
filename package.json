@@ -28,12 +28,12 @@
 	},
 	"scripts": {
 		"start": "react-scripts start",
-		"build": "GENERATE_SOURCEMAP=false react-scripts build && npm run copy-images",
+		"build": "react-scripts build && npm run copy-images",
+		"copy-images": "cp -r public/images build/images",
 		"test": "react-scripts test",
 		"eject": "react-scripts eject",
 		"generate-thumbnails": "ts-node src/scripts/imageProcessor.ts",
-		"test:images": "cross-env NODE_OPTIONS=\"--loader ts-node/esm\" ts-node src/scripts/test-image-processing.ts",
-		"copy-images": "cp -r public/images build/images"
+		"test:images": "cross-env NODE_OPTIONS=\"--loader ts-node/esm\" ts-node src/scripts/test-image-processing.ts"
 	},
 	"eslintConfig": {
 		"extends": [

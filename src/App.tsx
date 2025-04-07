@@ -22,6 +22,15 @@ import ErrorBoundary from './components/ErrorBoundary';
 const App: React.FC = () => {
     const [isNavbarVisible, setIsNavbarVisible] = React.useState(true);
 
+    React.useEffect(() => {
+        console.log('App mounted');
+        // Log any potential errors
+        window.onerror = function(msg, url, lineNo, columnNo, error) {
+            console.log('Window Error: ', {msg, url, lineNo, columnNo, error});
+            return false;
+        };
+    }, []);
+
     // Wrap component with PageLayout for top-level routes
     const withPageLayout = (Component: React.FC<any>, props: any = {}) => (
         <PageLayout>

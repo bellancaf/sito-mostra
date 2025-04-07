@@ -4,7 +4,7 @@ export const getImagePaths = (imagePath: string) => {
     // Remove any leading slash and ensure clean path
     const cleanPath = imagePath.startsWith('/') ? imagePath.slice(1) : imagePath;
 
-    // In production, images should be served from the root
+    // Use absolute paths from the root
     const paths = {
         thumbnail: `/images/thumbnails/${cleanPath}`,
         full: `/images/${cleanPath}`
